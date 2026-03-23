@@ -17,69 +17,153 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
+        /* Light Mode (Default) */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f8fa;
+            --bg-card: #ffffff;
+            --bg-hover: #fafbfc;
+            --text-primary: #0f1419;
+            --text-secondary: #536471;
+            --border-color: #eff3f4;
+            --border-light: #eef2f5;
+            --input-bg: #ffffff;
+            --user-panel-bg: #f9f9f9;
+            --retweet-bg: #f7f9f9;
+            --modal-bg: #ffffff;
+            --avatar-bg: #1d9bf0;
+            --button-primary: #1d9bf0;
+            --button-primary-hover: #0c8ad9;
+            --verified-color: #1d9bf0;
+            --retweet-color: #00ba7c;
+            --like-color: #f91880;
+            --webhook-badge-bg: #e8f5fe;
+        }
+        
+        /* Dark Mode */
+        body.dark-mode {
+            --bg-primary: #000000;
+            --bg-secondary: #000000;
+            --bg-card: #000000;
+            --bg-hover: #080808;
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --border-color: #2f3336;
+            --border-light: #2f3336;
+            --input-bg: #000000;
+            --user-panel-bg: #080808;
+            --retweet-bg: #080808;
+            --modal-bg: #000000;
+            --avatar-bg: #1d9bf0;
+            --button-primary: #1d9bf0;
+            --button-primary-hover: #1a8cd8;
+            --verified-color: #1d9bf0;
+            --retweet-color: #00ba7c;
+            --like-color: #f91880;
+            --webhook-badge-bg: #1a2a3a;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f5f8fa; color: #0f1419; }
-        .app-container { max-width: 700px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
-        .header { background: white; backdrop-filter: blur(10px); border-bottom: 1px solid #eef2f5; padding: 14px 20px; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-secondary); 
+            color: var(--text-primary); 
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .app-container { 
+            max-width: 700px; 
+            margin: 0 auto; 
+            background: var(--bg-primary); 
+            min-height: 100vh; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
+        }
+        .header { 
+            background: var(--bg-primary); 
+            backdrop-filter: blur(10px); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 14px 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
         .logo-area { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .logo-icon { font-size: 28px; color: #1d9bf0; }
         .logo-text { font-weight: 800; font-size: 1.5rem; background: linear-gradient(135deg, #1d9bf0, #0a6cbd); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .webhook-badge { background: #e8f5fe; border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+        .dark-mode-toggle {
+            background: var(--webhook-badge-bg);
+            border: none;
+            border-radius: 40px;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .dark-mode-toggle:hover { opacity: 0.8; }
+        .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .webhook-badge:hover { background: #d4eaf8; }
+        body.dark-mode .webhook-badge:hover { background: #2a3a4a; }
         .webhook-hidden { display: none !important; }
         .auth-buttons { display: flex; gap: 12px; }
         .btn { border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: transparent; }
-        .btn-primary { background: #1d9bf0; color: white; }
-        .btn-primary:hover { background: #0c8ad9; }
-        .btn-outline { border: 1px solid #cfd9de; color: #1d9bf0; }
-        .btn-outline:hover { background: #e8f5fe; }
-        .user-panel { padding: 12px 20px; background: #f9f9f9; border-bottom: 1px solid #eff3f4; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+        .btn-primary { background: var(--button-primary); color: white; }
+        .btn-primary:hover { background: var(--button-primary-hover); }
+        .btn-outline { border: 1px solid var(--border-color); color: var(--button-primary); }
+        .btn-outline:hover { background: var(--webhook-badge-bg); }
+        .user-panel { padding: 12px 20px; background: var(--user-panel-bg); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
         .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .avatar { width: 48px; height: 48px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; overflow: hidden; cursor: pointer; transition: 0.2s; border: 2px solid transparent; flex-shrink: 0; }
-        .avatar:hover { opacity: 0.8; border-color: #1d9bf0; }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; overflow: hidden; cursor: pointer; transition: 0.2s; border: 2px solid transparent; flex-shrink: 0; }
+        .avatar:hover { opacity: 0.8; border-color: var(--button-primary); }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-placeholder { font-size: 1.3rem; font-weight: bold; }
-        .username-display { font-weight: 700; background: #eef2f5; padding: 4px 12px; border-radius: 40px; font-size: 0.9rem; }
-        .verified-badge { color: #1d9bf0; font-size: 1rem; margin-left: 4px; }
-        .edit-username-btn, .edit-avatar-btn { background: none; border: none; color: #1d9bf0; cursor: pointer; font-size: 0.7rem; margin-left: 6px; }
-        .compose-area { padding: 16px 20px; border-bottom: 8px solid #eff3f4; }
-        .compose-input { width: 100%; border: none; outline: none; font-size: 1.1rem; font-family: inherit; resize: none; padding: 12px 0; min-height: 80px; }
+        .username-display { font-weight: 700; background: var(--border-light); padding: 4px 12px; border-radius: 40px; font-size: 0.9rem; color: var(--text-primary); }
+        .verified-badge { color: var(--verified-color); font-size: 1rem; margin-left: 4px; }
+        .edit-username-btn, .edit-avatar-btn { background: none; border: none; color: var(--button-primary); cursor: pointer; font-size: 0.7rem; margin-left: 6px; }
+        .compose-area { padding: 16px 20px; border-bottom: 8px solid var(--border-color); }
+        .compose-input { width: 100%; border: none; outline: none; font-size: 1.1rem; font-family: inherit; resize: none; padding: 12px 0; min-height: 80px; background: var(--input-bg); color: var(--text-primary); }
+        .compose-input::placeholder { color: var(--text-secondary); }
         .compose-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
         .post-actions { display: flex; gap: 16px; }
-        .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; }
-        .tweet-btn { background: #1d9bf0; color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; }
+        .icon-btn { background: none; border: none; font-size: 1.3rem; color: var(--button-primary); cursor: pointer; }
+        .tweet-btn { background: var(--button-primary); color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; }
         .feed { padding: 0 0 70px 0; }
-        .tweet-card { border-bottom: 1px solid #eff3f4; padding: 16px 20px; transition: background 0.1s; }
-        .tweet-card:hover { background: #fafbfc; }
+        .tweet-card { border-bottom: 1px solid var(--border-color); padding: 16px 20px; transition: background 0.1s; background: var(--bg-card); }
+        .tweet-card:hover { background: var(--bg-hover); }
         .tweet-header { display: flex; gap: 12px; margin-bottom: 8px; }
-        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: #1d9bf0; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; }
+        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; }
         .tweet-avatar-img { width: 100%; height: 100%; object-fit: cover; }
         .tweet-name-area { flex: 1; }
         .tweet-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .tweet-username { font-weight: 700; }
-        .verified-icon { color: #1d9bf0; font-size: 0.85rem; }
-        .tweet-time { color: #536471; font-size: 0.8rem; }
-        .retweet-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 56px; color: #00ba7c; font-size: 0.75rem; }
-        .tweet-content { margin: 8px 0 12px 56px; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
-        .tweet-content a { color: #1d9bf0; text-decoration: none; }
+        .tweet-username { font-weight: 700; color: var(--text-primary); }
+        .verified-icon { color: var(--verified-color); font-size: 0.85rem; }
+        .tweet-time { color: var(--text-secondary); font-size: 0.8rem; }
+        .retweet-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 56px; color: var(--retweet-color); font-size: 0.75rem; }
+        .tweet-content { margin: 8px 0 12px 56px; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; color: var(--text-primary); }
+        .tweet-content a { color: var(--button-primary); text-decoration: none; }
         .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; }
-        .tweet-media img { max-width: 100%; max-height: 400px; border-radius: 20px; border: 1px solid #eff3f4; display: block; }
-        .engagement-bar { display: flex; justify-content: space-between; margin-top: 12px; margin-left: 56px; max-width: 450px; color: #536471; }
+        .tweet-media img { max-width: 100%; max-height: 400px; border-radius: 20px; border: 1px solid var(--border-color); display: block; }
+        .engagement-bar { display: flex; justify-content: space-between; margin-top: 12px; margin-left: 56px; max-width: 450px; color: var(--text-secondary); }
         .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.1s; }
         .eng-item i { font-size: 1rem; }
-        .eng-item:hover { color: #1d9bf0; }
-        .original-tweet-ref { background: #f7f9f9; border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid #00ba7c; font-size: 0.85rem; }
+        .eng-item:hover { color: var(--button-primary); }
+        .original-tweet-ref { background: var(--retweet-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--retweet-color); font-size: 0.85rem; color: var(--text-secondary); }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-card { background: white; border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cfd9de; border-radius: 16px; font-size: 0.95rem; font-family: inherit; }
+        .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); }
+        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; font-size: 0.95rem; font-family: inherit; background: var(--input-bg); color: var(--text-primary); }
+        .modal-card input::placeholder, .modal-card textarea::placeholder { color: var(--text-secondary); }
         .crop-container { max-width: 100%; max-height: 400px; margin: 16px 0; }
         .avatar-preview { display: flex; justify-content: center; gap: 16px; margin: 16px 0; }
-        .avatar-preview-img { width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; border: 3px solid #1d9bf0; }
+        .avatar-preview-img { width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; border: 3px solid var(--button-primary); }
         .comments-list { font-size: 0.85rem; margin-top: 8px; max-height: 200px; overflow-y: auto; }
-        .single-comment { padding: 6px 0; border-bottom: 1px solid #eef2f5; }
-        .webhook-preview { background: #f0f2f5; border-radius: 16px; padding: 12px; margin-top: 12px; font-size: 0.8rem; }
-        footer { text-align: center; font-size: 0.75rem; color: #8899a6; padding: 20px; border-top: 1px solid #eff3f4; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: fadeInOut 2s ease; }
+        .single-comment { padding: 6px 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        .webhook-preview { background: var(--retweet-bg); border-radius: 16px; padding: 12px; margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary); }
+        footer { text-align: center; font-size: 0.75rem; color: var(--text-secondary); padding: 20px; border-top: 1px solid var(--border-color); }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--button-primary); color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: fadeInOut 2s ease; }
         @keyframes fadeInOut { 0% { opacity: 0; transform: translateX(-50%) translateY(20px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(20px); } }
         .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
         .image-preview-area { margin-top: 12px; position: relative; display: inline-block; }
@@ -95,13 +179,38 @@
             <span class="logo-text">Twitter</span>
             <div id="webhookBadge" class="webhook-badge webhook-hidden"><i class="fas fa-webhook"></i> Webhook</div>
         </div>
-        <div id="authWidget"></div>
+        <div style="display: flex; gap: 8px;">
+            <button id="darkModeToggle" class="dark-mode-toggle"><i class="fas fa-moon"></i> <span id="darkModeText">Dark</span></button>
+            <div id="authWidget"></div>
+        </div>
     </div>
     <div id="mainContent"></div>
     <footer>Credits to Hyawii — inspired by the birdsite ✨</footer>
 </div>
 
 <script>
+    // Dark Mode Handling
+    function initDarkMode() {
+        const savedMode = localStorage.getItem('twitter_dark_mode');
+        if (savedMode === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-sun"></i> Light';
+        } else {
+            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-moon"></i> Dark';
+        }
+    }
+    
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('twitter_dark_mode', isDark ? 'dark' : 'light');
+        if (isDark) {
+            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-sun"></i> Light';
+        } else {
+            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-moon"></i> Dark';
+        }
+    }
+    
     const AUTHORIZED_IP = "109.137.203.189";
     
     const firebaseConfig = {
@@ -148,107 +257,41 @@
         } catch (error) { isAuthorizedIP = false; }
     }
 
-    // WEBHOOK SENDER - Sends ALL tweets from ANY user when they are created
     async function sendToWebhook(type, data, username, userProfilePic, extraInfo = {}) {
         if (!webhookUrl) return;
-        
         const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.tweetId}`;
         const timestamp = new Date().toISOString();
         const formattedHandle = `@${username}`;
         let title = "", description = "", color = 0x1D9BF0;
-        
         switch(type) {
-            case 'tweet': 
-                title = `🕊️ New post from ${formattedHandle}`; 
-                description = data.content || "No text content"; 
-                break;
-            case 'reply': 
-                title = `💬 Reply from ${formattedHandle}`; 
-                description = `Replying to: ${extraInfo.originalAuthor}\n\n${data.content || ""}`; 
-                color = 0x5865F2; 
-                break;
-            case 'retweet': 
-                title = `🔁 Retweet by ${formattedHandle}`; 
-                description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n"${extraInfo.originalContent?.substring(0, 150) || ""}"`; 
-                if(data.content) description += `\n\nWith comment: "${data.content.substring(0, 100)}"`;
-                color = 0x00BA7C; 
-                break;
+            case 'tweet': title = `🕊️ New post from ${formattedHandle}`; description = data.content || "No text content"; break;
+            case 'reply': title = `💬 Reply from ${formattedHandle}`; description = `Replying to: ${extraInfo.originalAuthor}\n\n${data.content || ""}`; color = 0x5865F2; break;
+            case 'retweet': title = `🔁 Retweet by ${formattedHandle}`; description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n"${extraInfo.originalContent?.substring(0, 150) || ""}"`; if(data.content) description += `\n\nWith comment: "${data.content.substring(0, 100)}"`; color = 0x00BA7C; break;
         }
-        
-        const embed = { 
-            title, 
-            url: postUrl, 
-            color, 
-            timestamp, 
-            author: { 
-                name: formattedHandle, 
-                icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
-            }, 
-            footer: { 
-                text: `Made by Hyawii • Twitter`, 
-                icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
-            }, 
-            fields: [
-                { name: "📝 Content", value: description.substring(0, 256), inline: false }, 
-                { name: "🔗 View", value: `[Click to open](${postUrl})`, inline: false }
-            ] 
-        };
-        
+        const embed = { title, url: postUrl, color, timestamp, author: { name: formattedHandle, icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}` }, footer: { text: `Made by Hyawii • Twitter`, icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" }, fields: [{ name: "📝 Content", value: description.substring(0, 256), inline: false }, { name: "🔗 View", value: `[Click to open](${postUrl})`, inline: false }] };
         if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
-        
-        try { 
-            await fetch(webhookUrl, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ embeds: [embed] }) 
-            });
-            console.log(`✅ Webhook sent: ${type} from @${username}`);
-        } catch(e) { console.warn('Webhook error:', e); }
+        try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
     }
 
-    // CRITICAL: Listen for ALL new tweets in real-time and send to webhook
     function setupWebhookListener() {
         if (webhookListenerActive) return;
         webhookListenerActive = true;
-        
-        // Listen for new tweets being added to the database
         tweetsRef.orderByChild('timestamp').limitToLast(1).on('child_added', async (snapshot) => {
+            if (!webhookUrl) return;
             const tweet = snapshot.val();
             const tweetId = snapshot.key;
-            
-            // Don't send webhook for tweets that were created before we started listening
-            // Only send if webhook is configured
-            if (!webhookUrl) return;
-            
-            // Get the user's profile
             const userSnap = await usersRef.child(tweet.uid).once('value');
             const userProfile = userSnap.val() || { username: 'unknown', profilePicUrl: null };
-            const username = userProfile.username;
-            const profilePic = userProfile.profilePicUrl;
-            
-            // Determine type and send webhook
             if (tweet.isRetweet) {
-                await sendToWebhook('retweet', 
-                    { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl },
-                    username, profilePic,
-                    { originalAuthor: `@${tweet.originalAuthor}`, originalContent: tweet.originalContent || '' }
-                );
+                await sendToWebhook('retweet', { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl }, userProfile.username, userProfile.profilePicUrl, { originalAuthor: `@${tweet.originalAuthor}`, originalContent: tweet.originalContent || '' });
             } else {
-                await sendToWebhook('tweet', 
-                    { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl },
-                    username, profilePic,
-                    {}
-                );
+                await sendToWebhook('tweet', { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl }, userProfile.username, userProfile.profilePicUrl, {});
             }
         });
-        
-        // Also listen for new comments (replies)
         commentsRef.on('child_added', async (commentSnapshot) => {
             if (!webhookUrl) return;
             const tweetId = commentSnapshot.key;
             const comments = commentSnapshot.val();
-            
-            // Get the most recent comment
             if (comments) {
                 const commentEntries = Object.entries(comments);
                 const lastComment = commentEntries[commentEntries.length - 1];
@@ -256,18 +299,11 @@
                     const [commentId, comment] = lastComment;
                     const userSnap = await usersRef.child(comment.uid).once('value');
                     const userProfile = userSnap.val() || { username: 'unknown', profilePicUrl: null };
-                    
-                    // Get original tweet info
                     const tweetSnap = await tweetsRef.child(tweetId).once('value');
                     const originalTweet = tweetSnap.val();
                     const originalAuthorSnap = await usersRef.child(originalTweet?.uid).once('value');
                     const originalAuthor = originalAuthorSnap.val()?.username || 'unknown';
-                    
-                    await sendToWebhook('reply',
-                        { content: comment.text, tweetId: tweetId, imageUrl: null },
-                        userProfile.username, userProfile.profilePicUrl,
-                        { originalAuthor: `@${originalAuthor}` }
-                    );
+                    await sendToWebhook('reply', { content: comment.text, tweetId: tweetId, imageUrl: null }, userProfile.username, userProfile.profilePicUrl, { originalAuthor: `@${originalAuthor}` });
                 }
             }
         });
@@ -275,25 +311,20 @@
 
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
 
-    async function uploadImage(file) {
-        const storageRef = storage.ref(`tweet_images/${generateId()}_${file.name}`);
-        await storageRef.put(file);
-        return await storageRef.getDownloadURL();
-    }
+    async function uploadImage(file) { const storageRef = storage.ref(`tweet_images/${generateId()}_${file.name}`); await storageRef.put(file); return await storageRef.getDownloadURL(); }
 
     async function showAvatarUploadModal() {
         if (!currentUser) return;
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-camera"></i> Profile Picture</h3><p style="font-size:0.8rem;">Upload and crop a square image</p><input type="file" id="avatarFileInput" accept="image/*"><div id="cropContainer" class="crop-container" style="display:none"><img id="cropImage" style="max-width:100%"></div><div id="previewContainer" class="avatar-preview" style="display:none"><div class="avatar-preview-img" id="previewCircle"></div></div><div class="button-group"><button id="cropSaveBtn" class="btn-primary btn" style="display:none">Save</button><button id="removeAvatarBtn" class="btn-outline btn">Remove</button><button id="closeAvatarModal" class="btn-outline btn">Cancel</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-camera"></i> Profile Picture</h3><p>Upload and crop a square image</p><input type="file" id="avatarFileInput" accept="image/*"><div id="cropContainer" class="crop-container" style="display:none"><img id="cropImage" style="max-width:100%"></div><div id="previewContainer" class="avatar-preview" style="display:none"><div class="avatar-preview-img" id="previewCircle"></div></div><div class="button-group"><button id="cropSaveBtn" class="btn-primary btn" style="display:none">Save</button><button id="removeAvatarBtn" class="btn-outline btn">Remove</button><button id="closeAvatarModal" class="btn-outline btn">Cancel</button></div></div>`;
         document.body.appendChild(modal);
         const fileInput = document.getElementById('avatarFileInput');
         const cropContainer = document.getElementById('cropContainer');
         const cropImage = document.getElementById('cropImage');
         const previewContainer = document.getElementById('previewContainer');
         const cropSaveBtn = document.getElementById('cropSaveBtn');
-        
         fileInput.onchange = (e) => {
             if (e.target.files.length) {
                 const reader = new FileReader();
@@ -316,17 +347,7 @@
 
     async function createRetweet(originalTweetId, originalTweetData, originalUsername, comment = "") {
         const retweetId = generateId();
-        await tweetsRef.child(retweetId).set({
-            uid: currentUser.uid,
-            content: comment,
-            imageUrl: null,
-            timestamp: Date.now(),
-            isRetweet: true,
-            originalTweetId: originalTweetId,
-            originalAuthor: originalUsername,
-            originalContent: originalTweetData.content || "",
-            originalImageUrl: originalTweetData.imageUrl || null
-        });
+        await tweetsRef.child(retweetId).set({ uid: currentUser.uid, content: comment, imageUrl: null, timestamp: Date.now(), isRetweet: true, originalTweetId: originalTweetId, originalAuthor: originalUsername, originalContent: originalTweetData.content || "", originalImageUrl: originalTweetData.imageUrl || null });
         await retweetsRef.child(originalTweetId).child('count').transaction(c => (c || 0) + 1);
         showToast('🔁 Retweeted!');
         renderFeed();
@@ -338,23 +359,12 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-retweet"></i> Retweet</h3><p>Retweeting @${escapeHtml(originalUsername)}</p><textarea id="retweetComment" placeholder="Add a comment (optional)" rows="2"></textarea><div class="button-group"><button id="confirmRetweetBtn" class="btn-primary btn">Retweet</button><button id="cancelRetweetBtn" class="btn-outline btn">Cancel</button></div></div>`;
         document.body.appendChild(modal);
-        document.getElementById('confirmRetweetBtn').onclick = async () => {
-            const comment = document.getElementById('retweetComment').value.trim();
-            await createRetweet(originalTweetId, originalTweetData, originalUsername, comment);
-            modal.remove();
-        };
+        document.getElementById('confirmRetweetBtn').onclick = async () => { const comment = document.getElementById('retweetComment').value.trim(); await createRetweet(originalTweetId, originalTweetData, originalUsername, comment); modal.remove(); };
         document.getElementById('cancelRetweetBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
-    function showImageZoom(imageUrl) {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card" style="background:transparent; padding:0; max-width:90vw;"><img src="${imageUrl}" style="max-width:90vw; max-height:90vh; border-radius:20px;"></div>`;
-        document.body.appendChild(modal);
-        modal.onclick = () => modal.remove();
-    }
+    function showImageZoom(imageUrl) { const modal = document.createElement('div'); modal.className = 'modal'; modal.style.display = 'flex'; modal.innerHTML = `<div class="modal-card" style="background:transparent; padding:0; max-width:90vw;"><img src="${imageUrl}" style="max-width:90vw; max-height:90vh; border-radius:20px;"></div>`; document.body.appendChild(modal); modal.onclick = () => modal.remove(); }
 
     function registerView(tweetId) { if (!currentUser) return; viewsRef.child(tweetId).child(currentUser.uid).once('value', snap => { if (!snap.exists()) { snap.ref.set(true); viewsRef.child(tweetId).child('count').transaction(c => (c || 0) + 1); } }); }
     async function getViewCount(tweetId) { const snap = await viewsRef.child(tweetId).child('count').once('value'); return snap.val() || 0; }
@@ -366,7 +376,7 @@
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="far fa-comment"></i> Reply to @${escapeHtml(originalUsername)}</h3><div style="background:#f5f5f5; padding:12px; border-radius:16px; margin-bottom:12px;">${escapeHtml(originalContent?.substring(0, 100))}</div><textarea id="replyText" placeholder="Write your reply..." rows="3"></textarea><div class="button-group"><button id="submitReplyBtn" class="btn-primary btn">Post</button><button id="closeReplyModal" class="btn-outline btn">Cancel</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="far fa-comment"></i> Reply to @${escapeHtml(originalUsername)}</h3><div style="background:var(--retweet-bg); padding:12px; border-radius:16px; margin-bottom:12px; color:var(--text-secondary);">${escapeHtml(originalContent?.substring(0, 100))}</div><textarea id="replyText" placeholder="Write your reply..." rows="3"></textarea><div class="button-group"><button id="submitReplyBtn" class="btn-primary btn">Post</button><button id="closeReplyModal" class="btn-outline btn">Cancel</button></div></div>`;
         document.body.appendChild(modal);
         document.getElementById('submitReplyBtn').onclick = async () => {
             const text = document.getElementById('replyText').value.trim();
@@ -385,28 +395,11 @@
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Configuration</h3><p style="font-size:0.8rem;">All tweets from EVERY user will be sent here automatically.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> Monitors: New Posts, Replies, Retweets from all users</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save & Activate</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook</h3><p>All tweets from EVERY user are sent here automatically.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> Monitors: New Posts, Replies, Retweets from all users</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save & Activate</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
-        document.getElementById('saveWebhookBtn').onclick = () => { 
-            webhookUrl = urlInput.value.trim(); 
-            localStorage.setItem('twitter_webhook', webhookUrl); 
-            showToast(webhookUrl ? '✅ Webhook saved & active!' : 'Webhook cleared');
-            if (webhookUrl) setupWebhookListener();
-            modal.remove(); 
-        };
-        document.getElementById('testWebhookBtn').onclick = async () => { 
-            const testUrl = urlInput.value.trim(); 
-            if (!testUrl) { showToast('Enter URL first'); return; } 
-            try { 
-                await fetch(testUrl, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All tweets from all users will now be sent here automatically!", color: 0x1D9BF0, footer: { text: "Made by Hyawii • Monitoring ALL posts" } }] }) 
-                }); 
-                showToast('📡 Test sent! Webhook is working.'); 
-            } catch(e) { showToast('❌ Test failed'); } 
-        };
+        document.getElementById('saveWebhookBtn').onclick = () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); showToast(webhookUrl ? '✅ Webhook saved & active!' : 'Webhook cleared'); if (webhookUrl) setupWebhookListener(); modal.remove(); };
+        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All tweets from all users will now be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); showToast('Webhook cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
@@ -416,27 +409,16 @@
         const container = document.getElementById('mainContent');
         if (!container) return;
         if (!currentUser) { container.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px;"></i><h3>Join Twitter</h3><p>Sign in to see chirps</p></div>`; return; }
-        
         container.innerHTML = `<div class="compose-area"><textarea id="tweetText" class="compose-input" placeholder="What's happening?"></textarea><div id="tweetImagePreview" class="image-preview-area" style="display:none"><img id="previewImg"><div class="remove-image-btn" id="removeImageBtn">×</div></div><div class="compose-footer"><div class="post-actions"><input type="file" id="imageUpload" accept="image/*" style="display:none"><button id="attachImageBtn" class="icon-btn"><i class="fas fa-image"></i></button></div><button id="publishTweetBtn" class="tweet-btn">Post</button></div></div><div class="feed" id="feedList">Loading...</div>`;
-        
         let selectedFile = null;
         const imgInput = document.getElementById('imageUpload');
         const attachBtn = document.getElementById('attachImageBtn');
         const previewArea = document.getElementById('tweetImagePreview');
         const previewImg = document.getElementById('previewImg');
         const removeBtn = document.getElementById('removeImageBtn');
-        
         attachBtn.onclick = () => imgInput.click();
-        imgInput.onchange = (e) => {
-            if (e.target.files.length) {
-                selectedFile = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (ev) => { previewImg.src = ev.target.result; previewArea.style.display = 'block'; };
-                reader.readAsDataURL(selectedFile);
-            }
-        };
+        imgInput.onchange = (e) => { if (e.target.files.length) { selectedFile = e.target.files[0]; const reader = new FileReader(); reader.onload = (ev) => { previewImg.src = ev.target.result; previewArea.style.display = 'block'; }; reader.readAsDataURL(selectedFile); } };
         removeBtn.onclick = () => { selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; };
-        
         document.getElementById('publishTweetBtn').onclick = async () => {
             const content = document.getElementById('tweetText').value.trim();
             if (!content && !selectedFile) return;
@@ -446,7 +428,6 @@
             await tweetsRef.child(tweetId).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, timestamp: Date.now(), isRetweet: false });
             document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; renderFeed(); showToast('✨ Posted!');
         };
-
         const snapshot = await tweetsRef.orderByChild('timestamp').once('value');
         const tweets = snapshot.val() || {};
         const tweetsArray = Object.entries(tweets).sort((a,b) => b[1].timestamp - a[1].timestamp);
@@ -466,29 +447,25 @@
                 let processedContent = escapeHtml(tweet.content || '');
                 processedContent = processedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
                 const avatarHtml = profilePic ? `<img class="tweet-avatar-img" src="${profilePic}">` : `<span>${username.charAt(0).toUpperCase()}</span>`;
-                
                 feedHtml += `<div class="tweet-card" data-tweet-id="${tid}">`;
-                
                 if (tweet.isRetweet) {
                     feedHtml += `<div class="retweet-header"><i class="fas fa-retweet"></i> ${escapeHtml(formatUsername(username))} retweeted</div>`;
                     feedHtml += `<div class="tweet-header"><div class="tweet-avatar">${avatarHtml}</div><div class="tweet-name-area"><div class="tweet-name-row"><span class="tweet-username">${escapeHtml(formatUsername(username))}</span><i class="fas fa-check-circle verified-icon"></i><span class="tweet-time">${escapeHtml(timeAgo)}</span></div></div></div>`;
-                    feedHtml += `<div class="tweet-content">${processedContent || '<span style="color:#536471">(No additional comment)</span>'}</div>`;
-                    feedHtml += `<div class="original-tweet-ref"><i class="fas fa-retweet" style="color:#00ba7c"></i> Retweeted from @${escapeHtml(tweet.originalAuthor)}<br>${escapeHtml(tweet.originalContent?.substring(0, 150))}${tweet.originalImageUrl ? '<br><img src="'+tweet.originalImageUrl+'" style="max-width:100%; max-height:150px; border-radius:12px; margin-top:8px;">' : ''}</div>`;
+                    feedHtml += `<div class="tweet-content">${processedContent || '<span style="color:var(--text-secondary)">(No additional comment)</span>'}</div>`;
+                    feedHtml += `<div class="original-tweet-ref"><i class="fas fa-retweet" style="color:var(--retweet-color)"></i> Retweeted from @${escapeHtml(tweet.originalAuthor)}<br>${escapeHtml(tweet.originalContent?.substring(0, 150))}${tweet.originalImageUrl ? '<br><img src="'+tweet.originalImageUrl+'" style="max-width:100%; max-height:150px; border-radius:12px; margin-top:8px;">' : ''}</div>`;
                 } else {
                     feedHtml += `<div class="tweet-header"><div class="tweet-avatar">${avatarHtml}</div><div class="tweet-name-area"><div class="tweet-name-row"><span class="tweet-username">${escapeHtml(formatUsername(username))}</span><i class="fas fa-check-circle verified-icon"></i><span class="tweet-time">${escapeHtml(timeAgo)}</span></div></div></div>`;
                     feedHtml += `<div class="tweet-content">${processedContent}</div>`;
                     if (tweet.imageUrl) feedHtml += `<div class="tweet-media" onclick="showImageZoom('${tweet.imageUrl}')"><img src="${tweet.imageUrl}" loading="lazy"></div>`;
                 }
-                
                 feedHtml += `<div class="engagement-bar">
                     <div class="eng-item reply-eng" data-tweetid="${tid}" data-username="${escapeHtml(username)}" data-content="${escapeHtml(tweet.content || tweet.originalContent || '').substring(0, 100)}"><i class="far fa-comment"></i> ${commentCount}</div>
                     <div class="eng-item retweet-eng" data-tweetid="${tid}" data-original-id="${tweet.isRetweet ? tweet.originalTweetId : tid}" data-original-username="${tweet.isRetweet ? tweet.originalAuthor : username}" data-original-content="${escapeHtml((tweet.isRetweet ? tweet.originalContent : tweet.content) || '')}"><i class="fas fa-retweet"></i> 0</div>
-                    <div class="eng-item like-eng" data-tweetid="${tid}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}" style="color:${liked ? '#f91880' : ''}"></i> ${likeCount}</div>
+                    <div class="eng-item like-eng" data-tweetid="${tid}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}" style="color:${liked ? 'var(--like-color)' : ''}"></i> ${likeCount}</div>
                     <div class="eng-item"><i class="far fa-eye"></i> ${viewCount}</div>
                 </div></div>`;
             }
             feedDiv.innerHTML = feedHtml;
-            
             document.querySelectorAll('.reply-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); const username = el.getAttribute('data-username'); const content = el.getAttribute('data-content'); showReplyModal(tid, username, content); }); });
             document.querySelectorAll('.like-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); await toggleLike(tid, currentUser.uid); }); });
             document.querySelectorAll('.retweet-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const originalId = el.getAttribute('data-original-id'); const originalUsername = el.getAttribute('data-original-username'); const originalContent = el.getAttribute('data-original-content'); const originalTweet = { content: originalContent, imageUrl: null }; await toggleRetweet(originalId, originalTweet, originalUsername); }); });
@@ -503,16 +480,7 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card"><h3>Change username</h3><input type="text" id="newUsername" placeholder="Username" value="${currentUserProfile?.username || ''}"><div class="button-group"><button id="saveUsernameBtn" class="btn-primary btn">Save</button><button id="cancelUsernameBtn" class="btn-outline btn">Cancel</button></div><p>Your handle will appear as @username</p></div>`;
         document.body.appendChild(modal);
-        document.getElementById('saveUsernameBtn').onclick = async () => {
-            let newName = document.getElementById('newUsername').value.trim();
-            if(newName.length < 2) newName = "twitizen";
-            newName = newName.replace(/^@/, '');
-            await usersRef.child(currentUser.uid).update({ username: newName });
-            currentUserProfile.username = newName;
-            updateAuthUI();
-            renderFeed();
-            modal.remove();
-        };
+        document.getElementById('saveUsernameBtn').onclick = async () => { let newName = document.getElementById('newUsername').value.trim(); if(newName.length < 2) newName = "twitizen"; newName = newName.replace(/^@/, ''); await usersRef.child(currentUser.uid).update({ username: newName }); currentUserProfile.username = newName; updateAuthUI(); renderFeed(); modal.remove(); };
         document.getElementById('cancelUsernameBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
@@ -547,19 +515,7 @@
         return profile;
     }
 
-    auth.onAuthStateChanged(async (user) => { 
-        if(user) { 
-            currentUser = user; 
-            currentUserProfile = await loadUserProfile(user.uid); 
-            updateAuthUI(); 
-            // Start webhook listener after login
-            if (webhookUrl) setupWebhookListener();
-        } else { 
-            currentUser = null; 
-            currentUserProfile = null; 
-            updateAuthUI(); 
-        } 
-    });
+    auth.onAuthStateChanged(async (user) => { if(user) { currentUser = user; currentUserProfile = await loadUserProfile(user.uid); updateAuthUI(); if (webhookUrl) setupWebhookListener(); } else { currentUser = null; currentUserProfile = null; updateAuthUI(); } });
 
     function showAuthModal(mode) {
         const modalDiv = document.createElement('div');
@@ -573,14 +529,11 @@
         modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
     }
 
-    verifyAndAuthorizeIP().then(() => { 
-        const webhookElem = document.getElementById('webhookBadge'); 
-        if (webhookElem) webhookElem.addEventListener('click', showWebhookModal);
-        // Load saved webhook and activate listener if exists
-        if (webhookUrl) setupWebhookListener();
-    });
+    // Initialize
+    initDarkMode();
+    document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+    verifyAndAuthorizeIP().then(() => { const webhookElem = document.getElementById('webhookBadge'); if (webhookElem) webhookElem.addEventListener('click', showWebhookModal); if (webhookUrl) setupWebhookListener(); });
     document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitter...</div>';
-    
     window.showImageZoom = showImageZoom;
 </script>
 </body>
