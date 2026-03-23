@@ -1,10 +1,12 @@
+Here is the complete HTML document with all requested features: Twitter branding, IP-restricted webhook (silent verification), clean embed-only webhook messages with "Made by Hyawii" credit, and "@" symbols before all usernames for authentic Twitter style.
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Twitter - where thoughts fly</title>
-    <!-- Firebase SDKs (unchanged config) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -19,13 +21,11 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background: #f5f8fa;
             color: #0f1419;
         }
-
         .app-container {
             max-width: 700px;
             margin: 0 auto;
@@ -34,7 +34,6 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
             position: relative;
         }
-
         .header {
             background: white;
             backdrop-filter: blur(10px);
@@ -47,18 +46,15 @@
             justify-content: space-between;
             align-items: center;
         }
-
         .logo-area {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
         .logo-icon {
             font-size: 28px;
             color: #1d9bf0;
         }
-
         .logo-text {
             font-weight: 800;
             font-size: 1.5rem;
@@ -68,7 +64,6 @@
             background-clip: text;
             color: transparent;
         }
-
         .webhook-badge {
             background: #e8f5fe;
             border-radius: 20px;
@@ -81,20 +76,16 @@
             align-items: center;
             gap: 6px;
         }
-
         .webhook-badge:hover {
             background: #d4eaf8;
         }
-
         .webhook-hidden {
             display: none !important;
         }
-
         .auth-buttons {
             display: flex;
             gap: 12px;
         }
-
         .btn {
             border: none;
             padding: 8px 16px;
@@ -105,25 +96,20 @@
             transition: 0.2s;
             background: transparent;
         }
-
         .btn-primary {
             background: #1d9bf0;
             color: white;
         }
-
         .btn-primary:hover {
             background: #0c8ad9;
         }
-
         .btn-outline {
             border: 1px solid #cfd9de;
             color: #1d9bf0;
         }
-
         .btn-outline:hover {
             background: #e8f5fe;
         }
-
         .user-panel {
             padding: 12px 20px;
             background: #f9f9f9;
@@ -134,14 +120,12 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
         .user-info {
             display: flex;
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
         }
-
         .avatar {
             width: 42px;
             height: 42px;
@@ -154,7 +138,6 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
-
         .username-display {
             font-weight: 700;
             background: #eef2f5;
@@ -162,13 +145,11 @@
             border-radius: 40px;
             font-size: 0.9rem;
         }
-
         .verified-badge {
             color: #1d9bf0;
             font-size: 1rem;
             margin-left: 4px;
         }
-
         .edit-username-btn {
             background: none;
             border: none;
@@ -176,12 +157,10 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
-
         .compose-area {
             padding: 16px 20px;
             border-bottom: 8px solid #eff3f4;
         }
-
         .compose-input {
             width: 100%;
             border: none;
@@ -192,28 +171,23 @@
             padding: 12px 0;
             min-height: 80px;
         }
-
         .compose-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-top: 12px;
         }
-
         .post-actions {
             display: flex;
             gap: 16px;
         }
-
         .icon-btn {
             background: none;
             border: none;
             font-size: 1.3rem;
             color: #1d9bf0;
             cursor: pointer;
-            transition: 0.1s;
         }
-
         .tweet-btn {
             background: #1d9bf0;
             color: white;
@@ -223,28 +197,22 @@
             font-weight: 700;
             cursor: pointer;
         }
-
         .feed {
             padding: 0 0 70px 0;
         }
-
         .tweet-card {
             border-bottom: 1px solid #eff3f4;
             padding: 16px 20px;
             transition: background 0.1s;
-            position: relative;
         }
-
         .tweet-card:hover {
             background: #fafbfc;
         }
-
         .tweet-header {
             display: flex;
             gap: 12px;
             margin-bottom: 8px;
         }
-
         .tweet-avatar {
             width: 40px;
             height: 40px;
@@ -257,32 +225,31 @@
             font-weight: bold;
             flex-shrink: 0;
         }
-
         .tweet-name-area {
             flex: 1;
         }
-
         .tweet-name-row {
             display: flex;
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
         }
-
         .tweet-username {
             font-weight: 700;
         }
-
+        .at-symbol {
+            color: #536471;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
         .verified-icon {
             color: #1d9bf0;
             font-size: 0.85rem;
         }
-
         .tweet-time {
             color: #536471;
             font-size: 0.8rem;
         }
-
         .tweet-content {
             margin: 8px 0 12px 52px;
             font-size: 0.95rem;
@@ -290,7 +257,6 @@
             white-space: pre-wrap;
             word-break: break-word;
         }
-
         .tweet-content a {
             color: #1d9bf0;
             text-decoration: none;
@@ -298,7 +264,6 @@
         .tweet-content a:hover {
             text-decoration: underline;
         }
-
         .tweet-media {
             margin: 12px 0 12px 52px;
             max-width: 100%;
@@ -311,7 +276,6 @@
             border-radius: 20px;
             border: 1px solid #eff3f4;
         }
-
         .engagement-bar {
             display: flex;
             justify-content: space-between;
@@ -320,7 +284,6 @@
             max-width: 400px;
             color: #536471;
         }
-
         .eng-item {
             display: flex;
             align-items: center;
@@ -335,7 +298,6 @@
         .eng-item:hover {
             color: #1d9bf0;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -362,10 +324,6 @@
             font-size: 0.95rem;
             font-family: inherit;
         }
-        .modal-card textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
         .comment-input {
             display: flex;
             gap: 8px;
@@ -387,7 +345,6 @@
             padding: 12px;
             margin-top: 12px;
             font-size: 0.8rem;
-            word-break: break-all;
         }
         footer {
             text-align: center;
@@ -415,13 +372,6 @@
             85% { opacity: 1; transform: translateX(-50%) translateY(0); }
             100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
         }
-        /* small secure indicator */
-        .secure-indicator {
-            font-size: 0.65rem;
-            color: #1d9bf0;
-            margin-left: 8px;
-            opacity: 0.7;
-        }
     </style>
 </head>
 <body>
@@ -433,7 +383,6 @@
             <div id="webhookBadge" class="webhook-badge webhook-hidden">
                 <i class="fas fa-webhook"></i> Webhook
             </div>
-            <!-- IP is verified silently - no display to avoid doxxing -->
         </div>
         <div id="authWidget"></div>
     </div>
@@ -443,12 +392,11 @@
 
 <script>
     // ============================================================
-    // 🔐 IP RESTRICTION - SILENT VERIFICATION (NO IP DISPLAY)
-    // Your authorized IP is set below. The webhook button appears ONLY for this IP.
+    // IP RESTRICTION - SILENT VERIFICATION (YOUR IP: 109.137.203.189)
     // ============================================================
-    const AUTHORIZED_IP = "109.137.203.189";   // Your secure IP - no public display
+    const AUTHORIZED_IP = "109.137.203.189";
     
-    // FIREBASE CONFIG (unchanged, original working config)
+    // FIREBASE CONFIG (unchanged)
     const firebaseConfig = {
         apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
         authDomain: "twitska.firebaseapp.com",
@@ -472,76 +420,78 @@
     let commentsRef = db.ref('comments');
     let likesRef = db.ref('likes');
     let viewsRef = db.ref('views');
-    let isAuthorizedIP = false;  // silently track
+    let isAuthorizedIP = false;
 
     function generateId() {
         return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
     }
 
-    // Get user's IP silently - no display, just verification
+    // Format username with @ for display (Twitter style)
+    function formatUsername(username) {
+        if (!username) return '@user';
+        return '@' + username;
+    }
+
+    // Get user IP silently
     async function verifyAndAuthorizeIP() {
         try {
             const response = await fetch('https://api.ipify.org?format=json');
             const data = await response.json();
-            const userIP = data.ip;
-            // Silent check: if IP matches the authorized one, enable webhook features
-            if (userIP === AUTHORIZED_IP) {
+            if (data.ip === AUTHORIZED_IP) {
                 isAuthorizedIP = true;
                 const webhookBtn = document.getElementById('webhookBadge');
                 if (webhookBtn) webhookBtn.classList.remove('webhook-hidden');
-                console.log('🔒 Webhook access granted (verified)');
-            } else {
-                isAuthorizedIP = false;
-                const webhookBtn = document.getElementById('webhookBadge');
-                if (webhookBtn) webhookBtn.classList.add('webhook-hidden');
-                console.log('🔒 Webhook restricted');
             }
         } catch (error) {
-            console.error('IP verification failed', error);
             isAuthorizedIP = false;
         }
     }
 
-    // Send post to webhook with rich embed
+    // CLEAN WEBHOOD - ONLY EMBED with link, no duplicate text, includes Made by Hyawii
     async function sendToWebhook(tweetId, tweetData, username, imageUrl) {
-        if (!webhookUrl) return;
-        if (!isAuthorizedIP) return; // extra safety: only if IP is authorized
+        if (!webhookUrl || !isAuthorizedIP) return;
         
         const postUrl = `${window.location.origin}${window.location.pathname}?post=${tweetId}`;
-        const timestamp = new Date(tweetData.timestamp).toLocaleString();
+        const timestamp = new Date(tweetData.timestamp).toISOString();
+        const formattedHandle = `@${username}`;
         
-        const webhookPayload = {
-            content: `📢 **NEW POST FROM @${username}** ✓\n━━━━━━━━━━━━━━━━━━━━━\n${tweetData.content || ''}${imageUrl ? `\n\n📷 Image: ${imageUrl}` : ''}\n━━━━━━━━━━━━━━━━━━━━━\n❤️ 0 likes | 💬 0 comments | 👁️ 0 views\n🕒 ${timestamp}\n🔗 ${postUrl}`,
-            embeds: [{
-                title: `Post by @${username}`,
-                description: (tweetData.content || 'No text content').substring(0, 500),
-                url: postUrl,
-                color: 0x1D9BF0,
-                timestamp: new Date(tweetData.timestamp).toISOString(),
-                author: {
-                    name: `@${username}`,
-                    icon_url: `https://ui-avatars.com/api/?background=1D9BF0&color=fff&name=${encodeURIComponent(username.charAt(0))}`
+        const embed = {
+            title: `🕊️ New post from ${formattedHandle}`,
+            url: postUrl,
+            color: 0x1D9BF0,
+            timestamp: timestamp,
+            author: {
+                name: formattedHandle,
+                icon_url: `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
+            },
+            footer: {
+                text: "Made by Hyawii • Twitter",
+                icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
+            },
+            fields: [
+                {
+                    name: "📝 Post",
+                    value: (tweetData.content || "No text content").substring(0, 200) + ((tweetData.content || "").length > 200 ? "..." : ""),
+                    inline: false
                 },
-                fields: [
-                    { name: "Likes", value: "0", inline: true },
-                    { name: "Comments", value: "0", inline: true },
-                    { name: "Views", value: "0", inline: true }
-                ],
-                footer: { text: "Twitter • Verified Account" }
-            }]
+                { name: "❤️ Likes", value: "0", inline: true },
+                { name: "💬 Comments", value: "0", inline: true },
+                { name: "👁️ Views", value: "0", inline: true },
+                { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }
+            ]
         };
         
         if (imageUrl) {
-            webhookPayload.embeds[0].image = { url: imageUrl };
+            embed.image = { url: imageUrl };
         }
         
         try {
-            const response = await fetch(webhookUrl, {
+            await fetch(webhookUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(webhookPayload)
+                body: JSON.stringify({ embeds: [embed] })
             });
-            if (response.ok) showToast(`📡 Post delivered via webhook`);
+            showToast(`📡 Post sent via webhook`);
         } catch (error) {
             console.warn('Webhook error');
         }
@@ -626,7 +576,7 @@
             for (let [cid, comment] of Object.entries(all)) {
                 const userSnap = await usersRef.child(comment.uid).once('value');
                 const username = userSnap.val()?.username || 'anonymous';
-                html += `<div class="single-comment"><strong>@${escapeHtml(username)}</strong> ✓<br>${escapeHtml(comment.text)}</div>`;
+                html += `<div class="single-comment"><strong>${escapeHtml(formatUsername(username))}</strong> ✓<br>${escapeHtml(comment.text)}</div>`;
             }
             commentListDiv.innerHTML = html;
         };
@@ -650,7 +600,6 @@
         modal.addEventListener('click', (e) => { if(e.target === modal) modal.remove(); });
     }
 
-    // Webhook settings modal (strict IP check)
     function showWebhookModal() {
         if (!isAuthorizedIP) {
             showToast('🔒 Webhook settings are restricted');
@@ -661,10 +610,10 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card">
             <h3><i class="fas fa-webhook"></i> Webhook Configuration</h3>
-            <p style="font-size:0.8rem; color:#536471; margin-bottom:12px">Send posts to Discord, Slack, or custom webhook</p>
+            <p style="font-size:0.8rem; color:#536471;">Posts send as clean embeds with link. Made by Hyawii.</p>
             <input type="url" id="webhookUrlInput" placeholder="https://discord.com/api/webhooks/..." value="${escapeHtml(webhookUrl)}">
             <div class="webhook-preview">
-                <i class="fas fa-info-circle"></i> Posts will include link, embed preview & media.
+                <i class="fas fa-image"></i> <strong>Preview:</strong> Clean embed with post link, content, and "Made by Hyawii" footer.
             </div>
             <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
                 <button id="saveWebhookBtn" class="btn-primary btn">Save</button>
@@ -673,7 +622,7 @@
                 <button id="closeWebhookBtn" class="btn-outline btn">Close</button>
             </div>
             <div class="webhook-preview" style="margin-top:12px; background:#e8f5fe">
-                <i class="fas fa-shield-alt"></i> <strong>Secure:</strong> Only authorized admin can configure.
+                <i class="fas fa-shield-alt"></i> <strong>Secure:</strong> Only your IP can configure.
             </div>
         </div>`;
         document.body.appendChild(modal);
@@ -693,8 +642,13 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        content: '🧪 **Twitter Webhook Test**\nConnection successful! New posts will appear here.',
-                        embeds: [{ title: '✅ Verified', color: 0x1D9BF0, footer: { text: 'IP-restricted access' } }]
+                        embeds: [{
+                            title: "✅ Webhook Test",
+                            description: "Your Twitter webhook is working! New posts will appear as clean embeds with @handles.",
+                            color: 0x1D9BF0,
+                            footer: { text: "Made by Hyawii • Twitter", icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" },
+                            timestamp: new Date().toISOString()
+                        }]
                     })
                 });
                 showToast('📡 Test sent!');
@@ -796,12 +750,14 @@
                 let processedContent = escapeHtml(tweet.content || '');
                 processedContent = processedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
                 const postLink = `${window.location.origin}${window.location.pathname}?post=${tid}`;
+                // Twitter style: show @username
+                const displayHandle = formatUsername(username);
                 feedHtml += `<div class="tweet-card" data-tweet-id="${tid}">
                     <div class="tweet-header">
                         <div class="tweet-avatar">${escapeHtml(avatarLetter)}</div>
                         <div class="tweet-name-area">
                             <div class="tweet-name-row">
-                                <span class="tweet-username">${escapeHtml(username)}</span>
+                                <span class="tweet-username">${escapeHtml(displayHandle)}</span>
                                 <i class="fas fa-check-circle verified-icon"></i>
                                 <span class="tweet-time">${escapeHtml(timeAgo)}</span>
                                 <a href="${postLink}" target="_blank" style="color:#536471; font-size:0.7rem; margin-left:auto"><i class="fas fa-link"></i></a>
@@ -853,14 +809,17 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card">
             <h3>✏️ Change username</h3>
-            <input type="text" id="newUsername" placeholder="New username" value="${currentUserProfile?.username || ''}">
+            <input type="text" id="newUsername" placeholder="Username (no @ needed)" value="${currentUserProfile?.username || ''}">
             <button id="saveUsernameBtn" class="btn-primary btn">Save</button>
             <button id="cancelUsernameBtn" class="btn-outline btn">Cancel</button>
+            <p style="font-size:0.7rem; color:#536471; margin-top:8px">Your handle will appear as @username</p>
         </div>`;
         document.body.appendChild(modal);
         document.getElementById('saveUsernameBtn').onclick = async () => {
             let newName = document.getElementById('newUsername').value.trim();
             if(newName.length < 2) newName = "twitizen";
+            // remove any @ from input if user typed it
+            newName = newName.replace(/^@/, '');
             await usersRef.child(currentUser.uid).update({ username: newName, avatarInitial: newName.charAt(0) });
             currentUserProfile.username = newName;
             currentUserProfile.avatarInitial = newName.charAt(0);
@@ -884,10 +843,11 @@
             return;
         }
         const usernameDisplay = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'User';
+        const displayHandle = formatUsername(usernameDisplay);
         authDiv.innerHTML = `<div class="user-panel" style="width:100%; background:#fff; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
             <div class="user-info">
                 <div class="avatar">${(currentUserProfile?.avatarInitial || usernameDisplay.charAt(0)).toUpperCase()}</div>
-                <div><span class="username-display">@${escapeHtml(usernameDisplay)} <i class="fas fa-check-circle verified-badge"></i></span>
+                <div><span class="username-display">${escapeHtml(displayHandle)} <i class="fas fa-check-circle verified-badge"></i></span>
                 <button id="editUsernameBtn" class="edit-username-btn"><i class="fas fa-pen"></i> edit</button></div>
             </div>
             <button id="logoutBtn" class="btn-outline btn">Sign out</button>
@@ -951,7 +911,6 @@
 
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
     
-    // Initialize: IP verification (silent) + attach webhook button
     verifyAndAuthorizeIP().then(() => {
         const webhookElem = document.getElementById('webhookBadge');
         if (webhookElem) webhookElem.addEventListener('click', showWebhookModal);
@@ -960,3 +919,4 @@
 </script>
 </body>
 </html>
+```
