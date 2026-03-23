@@ -9,9 +9,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-    <!-- Font Awesome 6 (free icons) -->
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -26,7 +26,6 @@
             color: #0f1419;
         }
 
-        /* main app layout */
         .app-container {
             max-width: 700px;
             margin: 0 auto;
@@ -36,7 +35,6 @@
             position: relative;
         }
 
-        /* header */
         .header {
             background: white;
             backdrop-filter: blur(10px);
@@ -69,6 +67,20 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+        }
+
+        .webhook-badge {
+            background: #e8f5fe;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            color: #1d9bf0;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .webhook-badge:hover {
+            background: #d4eaf8;
         }
 
         .auth-buttons {
@@ -105,7 +117,6 @@
             background: #e8f5fe;
         }
 
-        /* user panel */
         .user-panel {
             padding: 12px 20px;
             background: #f9f9f9;
@@ -159,7 +170,6 @@
             font-size: 0.8rem;
         }
 
-        /* tweet composer */
         .compose-area {
             padding: 16px 20px;
             border-bottom: 8px solid #eff3f4;
@@ -207,7 +217,6 @@
             cursor: pointer;
         }
 
-        /* feed */
         .feed {
             padding: 0 0 70px 0;
         }
@@ -216,6 +225,11 @@
             border-bottom: 1px solid #eff3f4;
             padding: 16px 20px;
             transition: background 0.1s;
+            position: relative;
+        }
+
+        .tweet-card:hover {
+            background: #fafbfc;
         }
 
         .tweet-header {
@@ -315,7 +329,6 @@
             color: #1d9bf0;
         }
 
-        /* modal overlay */
         .modal {
             display: none;
             position: fixed;
@@ -329,24 +342,22 @@
         .modal-card {
             background: white;
             border-radius: 28px;
-            max-width: 450px;
+            max-width: 500px;
             width: 90%;
             padding: 24px;
-            text-align: center;
         }
-        .modal-card input {
+        .modal-card input, .modal-card textarea {
             width: 100%;
             padding: 12px;
-            margin: 16px 0;
+            margin: 12px 0;
             border: 1px solid #cfd9de;
-            border-radius: 40px;
-            font-size: 1rem;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
         }
-        .comment-section {
-            background: #f9f9f9;
-            margin-top: 8px;
-            padding: 12px;
-            border-radius: 20px;
+        .modal-card textarea {
+            resize: vertical;
+            min-height: 80px;
         }
         .comment-input {
             display: flex;
@@ -363,12 +374,39 @@
             padding: 6px 0;
             border-bottom: 1px solid #eef2f5;
         }
+        .webhook-preview {
+            background: #f0f2f5;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
         footer {
             text-align: center;
             font-size: 0.75rem;
             color: #8899a6;
             padding: 20px;
             border-top: 1px solid #eff3f4;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1d9bf0;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1100;
+            animation: fadeInOut 2s ease;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(20px); }
         }
     </style>
 </head>
@@ -378,6 +416,9 @@
         <div class="logo-area">
             <i class="fab fa-twitter logo-icon"></i>
             <span class="logo-text">Twitter</span>
+            <div class="webhook-badge" id="webhookBadge">
+                <i class="fas fa-webhook"></i> Webhook
+            </div>
         </div>
         <div id="authWidget"></div>
     </div>
@@ -386,10 +427,10 @@
 </div>
 
 <script>
-    // FIREBASE CONFIG (provided)
+    // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
-        authDomain: "Twitska.firebaseapp.com",
+        authDomain: "twitska.firebaseapp.com",
         databaseURL: "https://Twitter-default-rtdb.europe-west1.firebasedatabase.app",
         projectId: "Twitter",
         storageBucket: "Twitter.firebasestorage.app",
@@ -402,21 +443,90 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Helper: generate unique ID
+    // Webhook configuration
+    let webhookUrl = localStorage.getItem('Twitter_webhook') || '';
+    
     function generateId() {
         return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
     }
 
-    // Global state
-    let currentUser = null;        // firebase user object
-    let currentUserProfile = null;  // { username, uid, avatarInitial }
+    let currentUser = null;
+    let currentUserProfile = null;
     let tweetsRef = db.ref('tweets');
     let usersRef = db.ref('users');
     let commentsRef = db.ref('comments');
     let likesRef = db.ref('likes');
-    let viewsRef = db.ref('views');   // store view counts per tweet
+    let viewsRef = db.ref('views');
 
-    // Helper: update view count (increment when tweet displayed)
+    // Send post to webhook with embed format
+    async function sendToWebhook(tweetId, tweetData, username, userAvatar, imageUrl) {
+        if (!webhookUrl) return;
+        
+        const postUrl = `${window.location.origin}${window.location.pathname}?post=${tweetId}`;
+        const timestamp = new Date(tweetData.timestamp).toLocaleString();
+        
+        // Create embed content that shows the post
+        let embedContent = `
+📢 **NEW POST FROM @${username}** ${username ? '✓' : ''}
+━━━━━━━━━━━━━━━━━━━━━
+${tweetData.content || ''}
+${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
+━━━━━━━━━━━━━━━━━━━━━
+❤️ Likes: 0 | 💬 Comments: 0 | 👁️ Views: 0
+🕒 ${timestamp}
+🔗 ${postUrl}
+        `;
+        
+        const webhookPayload = {
+            content: embedContent,
+            embeds: [{
+                title: `Post by @${username}`,
+                description: tweetData.content?.substring(0, 500) || 'No text content',
+                url: postUrl,
+                color: 0x1D9BF0,
+                timestamp: new Date(tweetData.timestamp).toISOString(),
+                author: {
+                    name: `@${username}`,
+                    icon_url: `https://ui-avatars.com/api/?background=1D9BF0&color=fff&name=${encodeURIComponent(username.charAt(0))}`
+                },
+                fields: [
+                    { name: "Likes", value: "0", inline: true },
+                    { name: "Comments", value: "0", inline: true },
+                    { name: "Views", value: "0", inline: true }
+                ],
+                footer: { text: "Twitter • Verified Account" }
+            }]
+        };
+        
+        if (imageUrl) {
+            webhookPayload.embeds[0].image = { url: imageUrl };
+        }
+        
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(webhookPayload)
+            });
+            
+            if (response.ok) {
+                showToast(`📡 Post sent to webhook!`);
+            } else {
+                console.warn('Webhook failed:', response.status);
+            }
+        } catch (error) {
+            console.error('Webhook error:', error);
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
     function registerView(tweetId) {
         if (!currentUser) return;
         const viewRef = viewsRef.child(tweetId).child(currentUser.uid);
@@ -428,13 +538,11 @@
         });
     }
 
-    // get view count
     async function getViewCount(tweetId) {
         const snap = await viewsRef.child(tweetId).child('count').once('value');
         return snap.val() || 0;
     }
 
-    // get like status & count
     async function getLikeInfo(tweetId, userId) {
         const likeSnap = await likesRef.child(tweetId).child(userId).once('value');
         const liked = likeSnap.exists();
@@ -453,25 +561,28 @@
             await likeNode.set(true);
             await countNode.transaction(c => (c || 0) + 1);
         }
-        renderFeed(); // refresh
+        renderFeed();
     }
 
-    // get comment count
     async function getCommentCount(tweetId) {
         const snap = await commentsRef.child(tweetId).once('value');
         const comments = snap.val();
         return comments ? Object.keys(comments).length : 0;
     }
 
-    // show comment modal for a tweet
-    function showCommentsModal(tweetId, tweetData) {
+    function showCommentsModal(tweetId) {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        let commentsHtml = '<div class="modal-card"><h3>💬 Comments</h3><div id="commentsList" class="comments-list">Loading...</div>';
-        commentsHtml += '<div class="comment-input"><input type="text" id="newCommentInput" placeholder="Write a reply..."><button id="postCommentBtn" class="btn-primary btn">Reply</button></div>';
-        commentsHtml += '<button id="closeModalBtn" class="btn-outline btn" style="margin-top:12px">Close</button></div>';
-        modal.innerHTML = commentsHtml;
+        modal.innerHTML = `<div class="modal-card">
+            <h3><i class="far fa-comment"></i> Comments</h3>
+            <div id="commentsList" class="comments-list">Loading...</div>
+            <div class="comment-input">
+                <input type="text" id="newCommentInput" placeholder="Write a reply...">
+                <button id="postCommentBtn" class="btn-primary btn">Reply</button>
+            </div>
+            <button id="closeModalBtn" class="btn-outline btn" style="margin-top:12px; width:100%">Close</button>
+        </div>`;
         document.body.appendChild(modal);
 
         const loadComments = async () => {
@@ -480,14 +591,14 @@
             const commentListDiv = document.getElementById('commentsList');
             if (!commentListDiv) return;
             if (Object.keys(all).length === 0) {
-                commentListDiv.innerHTML = '<div style="text-align:center;padding:12px">No comments yet.</div>';
+                commentListDiv.innerHTML = '<div style="text-align:center;padding:12px">No comments yet. Be the first!</div>';
                 return;
             }
             let html = '';
             for (let [cid, comment] of Object.entries(all)) {
                 const userSnap = await usersRef.child(comment.uid).once('value');
                 const username = userSnap.val()?.username || 'anonymous';
-                html += `<div class="single-comment"><strong>${escapeHtml(username)}</strong> ${escapeHtml(comment.text)}</div>`;
+                html += `<div class="single-comment"><strong>@${escapeHtml(username)}</strong> <span>✓</span><br>${escapeHtml(comment.text)}</div>`;
             }
             commentListDiv.innerHTML = html;
         };
@@ -505,14 +616,82 @@
             });
             input.value = '';
             loadComments();
+            renderFeed();
         });
-        document.getElementById('closeModalBtn')?.addEventListener('click', () => {
-            modal.remove();
-        });
+        document.getElementById('closeModalBtn')?.addEventListener('click', () => modal.remove());
         modal.addEventListener('click', (e) => { if(e.target === modal) modal.remove(); });
     }
 
-    // render feed with tweets, images, links, likes, comments, views
+    // Webhook settings modal
+    function showWebhookModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `<div class="modal-card">
+            <h3><i class="fas fa-webhook"></i> Webhook Configuration</h3>
+            <p style="font-size:0.8rem; color:#536471; margin-bottom:12px">Send all new posts to Discord, Slack, or any webhook URL</p>
+            <input type="url" id="webhookUrlInput" placeholder="https://discord.com/api/webhooks/..." value="${escapeHtml(webhookUrl)}">
+            <div class="webhook-preview" id="webhookPreview">
+                <i class="fas fa-info-circle"></i> Posts will be sent with embed showing:
+                <ul style="margin-top:8px; margin-left:20px">
+                    <li>🔗 Link to the post</li>
+                    <li>📝 Post content preview</li>
+                    <li>🖼️ Image attachment (if any)</li>
+                    <li>📊 Engagement stats</li>
+                </ul>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:16px">
+                <button id="saveWebhookBtn" class="btn-primary btn">Save</button>
+                <button id="testWebhookBtn" class="btn-outline btn">Test</button>
+                <button id="clearWebhookBtn" class="btn-outline btn">Clear</button>
+                <button id="closeWebhookBtn" class="btn-outline btn">Close</button>
+            </div>
+        </div>`;
+        document.body.appendChild(modal);
+        
+        const urlInput = document.getElementById('webhookUrlInput');
+        document.getElementById('saveWebhookBtn').onclick = () => {
+            webhookUrl = urlInput.value.trim();
+            localStorage.setItem('Twitter_webhook', webhookUrl);
+            showToast(webhookUrl ? '✅ Webhook saved!' : 'Webhook cleared');
+            modal.remove();
+        };
+        document.getElementById('testWebhookBtn').onclick = async () => {
+            const testUrl = urlInput.value.trim();
+            if (!testUrl) {
+                showToast('Please enter a webhook URL first');
+                return;
+            }
+            try {
+                await fetch(testUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: '🧪 **Twitter Webhook Test**\nYour webhook is working correctly! New posts will appear here automatically.',
+                        embeds: [{
+                            title: '✅ Connection Successful',
+                            description: 'Twitter webhook is now active. Every new post will be sent here with full details and embed preview.',
+                            color: 0x1D9BF0,
+                            footer: { text: 'Credits to Hyawii' }
+                        }]
+                    })
+                });
+                showToast('📡 Test sent! Check your webhook destination.');
+            } catch(e) {
+                showToast('❌ Test failed: Invalid webhook URL');
+            }
+        };
+        document.getElementById('clearWebhookBtn').onclick = () => {
+            urlInput.value = '';
+            webhookUrl = '';
+            localStorage.removeItem('Twitter_webhook');
+            showToast('Webhook cleared');
+            modal.remove();
+        };
+        document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
+        modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+    }
+
     async function renderFeed() {
         const container = document.getElementById('mainContent');
         if (!container) return;
@@ -532,7 +711,6 @@
             <div id="imagePreview" style="margin-top:8px; font-size:12px; color:#1d9bf0"></div>
         </div><div class="feed" id="feedList">Loading tweets...</div>`;
 
-        // image upload logic
         let selectedImageFile = null;
         const imgInput = document.getElementById('imageUpload');
         const attachBtn = document.getElementById('attachImageBtn');
@@ -541,20 +719,22 @@
         imgInput.onchange = (e) => {
             if (e.target.files.length) {
                 selectedImageFile = e.target.files[0];
-                previewDiv.innerHTML = `📷 Image selected: ${selectedImageFile.name}`;
+                previewDiv.innerHTML = `📷 ${selectedImageFile.name}`;
             } else {
                 selectedImageFile = null;
                 previewDiv.innerHTML = '';
             }
         };
+        
         document.getElementById('publishTweetBtn').onclick = async () => {
             const textArea = document.getElementById('tweetText');
             const content = textArea.value.trim();
             if (!content && !selectedImageFile) return;
+            
             let imageUrl = null;
             if (selectedImageFile) {
                 const storageRef = storage.ref(`tweet_images/${generateId()}_${selectedImageFile.name}`);
-                const uploadTask = await storageRef.put(selectedImageFile);
+                await storageRef.put(selectedImageFile);
                 imageUrl = await storageRef.getDownloadURL();
             }
             const tweetId = generateId();
@@ -564,14 +744,19 @@
                 imageUrl: imageUrl,
                 timestamp: Date.now()
             });
+            
+            // Send to webhook after post is created
+            const username = currentUserProfile?.username || 'twitizen';
+            await sendToWebhook(tweetId, { content, timestamp: Date.now() }, username, null, imageUrl);
+            
             textArea.value = '';
             selectedImageFile = null;
             if(previewDiv) previewDiv.innerHTML = '';
             imgInput.value = '';
             renderFeed();
+            showToast('✨ Post published!');
         };
 
-        // load tweets
         const snapshot = await tweetsRef.orderByChild('timestamp').once('value');
         const tweets = snapshot.val() || {};
         const tweetsArray = Object.entries(tweets).sort((a,b) => b[1].timestamp - a[1].timestamp);
@@ -581,16 +766,16 @@
             let feedHtml = '';
             for (let [tid, tweet] of tweetsArray) {
                 const userSnap = await usersRef.child(tweet.uid).once('value');
-                const profile = userSnap.val() || { username: 'unknown', avatarInitial: '?' };
-                const username = profile.username || 'twitizen';
+                const profile = userSnap.val() || { username: 'twitizen', avatarInitial: '?' };
+                const username = profile.username;
                 const avatarLetter = username.charAt(0).toUpperCase();
                 const timeAgo = new Date(tweet.timestamp).toLocaleString();
                 const { liked, count: likeCount } = await getLikeInfo(tid, currentUser.uid);
                 const commentCount = await getCommentCount(tid);
                 const viewCount = await getViewCount(tid);
-                // Process links in content: blue clickable
                 let processedContent = escapeHtml(tweet.content || '');
                 processedContent = processedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+                const postLink = `${window.location.origin}${window.location.pathname}?post=${tid}`;
                 feedHtml += `<div class="tweet-card" data-tweet-id="${tid}">
                     <div class="tweet-header">
                         <div class="tweet-avatar">${escapeHtml(avatarLetter)}</div>
@@ -599,6 +784,7 @@
                                 <span class="tweet-username">${escapeHtml(username)}</span>
                                 <i class="fas fa-check-circle verified-icon"></i>
                                 <span class="tweet-time">${escapeHtml(timeAgo)}</span>
+                                <a href="${postLink}" target="_blank" style="color:#536471; font-size:0.7rem; margin-left:auto"><i class="fas fa-link"></i></a>
                             </div>
                         </div>
                     </div>
@@ -608,18 +794,17 @@
                         <div class="eng-item comment-eng" data-tweetid="${tid}"><i class="far fa-comment"></i> ${commentCount}</div>
                         <div class="eng-item like-eng" data-tweetid="${tid}" data-liked="${liked}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}" style="color:${liked ? '#f91880' : ''}"></i> ${likeCount}</div>
                         <div class="eng-item"><i class="far fa-eye"></i> ${viewCount}</div>
-                        <div class="eng-item"><i class="fas fa-retweet"></i> 0</div>
+                        <div class="eng-item share-btn" data-url="${postLink}"><i class="fas fa-share"></i> Share</div>
                     </div>
                 </div>`;
             }
             feedDiv.innerHTML = feedHtml;
-            // attach comment & like events
+            
             document.querySelectorAll('.comment-eng').forEach(el => {
                 el.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const tid = el.getAttribute('data-tweetid');
-                    const tweetData = tweets[tid];
-                    if(tweetData) showCommentsModal(tid, tweetData);
+                    showCommentsModal(tid);
                 });
             });
             document.querySelectorAll('.like-eng').forEach(el => {
@@ -629,14 +814,18 @@
                     await toggleLike(tid, currentUser.uid);
                 });
             });
-            // register views for each tweet displayed
-            for(let [tid] of tweetsArray) {
-                registerView(tid);
-            }
+            document.querySelectorAll('.share-btn').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const url = el.getAttribute('data-url');
+                    navigator.clipboard.writeText(url);
+                    showToast('🔗 Post link copied to clipboard!');
+                });
+            });
+            for(let [tid] of tweetsArray) registerView(tid);
         }
     }
 
-    // username edit modal (persist)
     async function showEditUsernameModal() {
         if(!currentUser) return;
         const modal = document.createElement('div');
@@ -649,11 +838,8 @@
             <button id="cancelUsernameBtn" class="btn-outline btn">Cancel</button>
         </div>`;
         document.body.appendChild(modal);
-        const saveBtn = modal.querySelector('#saveUsernameBtn');
-        const cancelBtn = modal.querySelector('#cancelUsernameBtn');
-        const inputField = modal.querySelector('#newUsername');
-        saveBtn.onclick = async () => {
-            let newName = inputField.value.trim();
+        document.getElementById('saveUsernameBtn').onclick = async () => {
+            let newName = document.getElementById('newUsername').value.trim();
             if(newName.length < 2) newName = "twitizen";
             await usersRef.child(currentUser.uid).update({ username: newName, avatarInitial: newName.charAt(0) });
             currentUserProfile.username = newName;
@@ -662,11 +848,10 @@
             renderFeed();
             modal.remove();
         };
-        cancelBtn.onclick = () => modal.remove();
+        document.getElementById('cancelUsernameBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
-    // update header and user panel
     function updateAuthUI() {
         const authDiv = document.getElementById('authWidget');
         const mainDiv = document.getElementById('mainContent');
@@ -678,7 +863,6 @@
             if(mainDiv) mainDiv.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitter</h3><p>Sign in to see the chirps</p></div>`;
             return;
         }
-        // logged in user panel
         const usernameDisplay = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'User';
         authDiv.innerHTML = `<div class="user-panel" style="width:100%; background:#fff; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
             <div class="user-info">
@@ -693,7 +877,6 @@
             currentUser = null;
             currentUserProfile = null;
             updateAuthUI();
-            if(mainDiv) mainDiv.innerHTML = '';
         });
         document.getElementById('editUsernameBtn')?.addEventListener('click', showEditUsernameModal);
         renderFeed();
@@ -702,7 +885,7 @@
     async function loadUserProfile(uid) {
         const snap = await usersRef.child(uid).once('value');
         if(snap.exists()) return snap.val();
-        const defaultName = uid.slice(0,6);
+        const defaultName = 'user_' + uid.slice(0,4);
         const profile = { username: defaultName, avatarInitial: defaultName.charAt(0) };
         await usersRef.child(uid).set(profile);
         return profile;
@@ -720,7 +903,6 @@
         }
     });
 
-    // auth modal for login/register
     function showAuthModal(mode) {
         const modalDiv = document.createElement('div');
         modalDiv.className = 'modal';
@@ -728,14 +910,13 @@
         const isLogin = mode === 'login';
         modalDiv.innerHTML = `<div class="modal-card">
             <h2>${isLogin ? 'Sign in' : 'Create account'}</h2>
-            <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
+            <input type="email" id="authEmail" placeholder="Email">
             <input type="password" id="authPassword" placeholder="Password">
             <button id="authSubmitBtn" class="btn-primary btn">${isLogin ? 'Login' : 'Sign up'}</button>
             <button id="closeAuthModal" class="btn-outline btn" style="margin-top:8px">Cancel</button>
         </div>`;
         document.body.appendChild(modalDiv);
-        const submitBtn = modalDiv.querySelector('#authSubmitBtn');
-        submitBtn.onclick = async () => {
+        document.getElementById('authSubmitBtn').onclick = async () => {
             const email = modalDiv.querySelector('#authEmail').value;
             const pwd = modalDiv.querySelector('#authPassword').value;
             try {
@@ -749,7 +930,8 @@
     }
 
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
-    // initial empty container
+    
+    document.getElementById('webhookBadge')?.addEventListener('click', showWebhookModal);
     document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitter...</div>';
 </script>
 </body>
