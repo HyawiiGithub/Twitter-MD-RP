@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Twitter - where thoughts fly</title>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f8fa;
+            color: #0f1419;
+        }
+
+        /* main app layout */
+        .app-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* header */
+        .header {
+            background: white;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #eef2f5;
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+            color: #1d9bf0;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #1d9bf0, #0a6cbd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: transparent;
+        }
+
+        .btn-primary {
+            background: #1d9bf0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0c8ad9;
+        }
+
+        .btn-outline {
+            border: 1px solid #cfd9de;
+            color: #1d9bf0;
+        }
+
+        .btn-outline:hover {
+            background: #e8f5fe;
+        }
+
+        /* user panel */
+        .user-panel {
+            padding: 12px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eff3f4;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background: #1d9bf0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .username-display {
+            font-weight: 700;
+            background: #eef2f5;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        .verified-badge {
+            color: #1d9bf0;
+            font-size: 1rem;
+            margin-left: 4px;
+        }
+
+        .edit-username-btn {
+            background: none;
+            border: none;
+            color: #1d9bf0;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* tweet composer */
+        .compose-area {
+            padding: 16px 20px;
+            border-bottom: 8px solid #eff3f4;
+        }
+
+        .compose-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 1.1rem;
+            font-family: inherit;
+            resize: none;
+            padding: 12px 0;
+            min-height: 80px;
+        }
+
+        .compose-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: #1d9bf0;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .tweet-btn {
+            background: #1d9bf0;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* feed */
+        .feed {
+            padding: 0 0 70px 0;
+        }
+
+        .tweet-card {
+            border-bottom: 1px solid #eff3f4;
+            padding: 16px 20px;
+            transition: background 0.1s;
+        }
+
+        .tweet-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .tweet-avatar {
+            width: 40px;
+            height: 40px;
+            background: #1d9bf0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .tweet-name-area {
+            flex: 1;
+        }
+
+        .tweet-name-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tweet-username {
+            font-weight: 700;
+        }
+
+        .verified-icon {
+            color: #1d9bf0;
+            font-size: 0.85rem;
+        }
+
+        .tweet-time {
+            color: #536471;
+            font-size: 0.8rem;
+        }
+
+        .tweet-content {
+            margin: 8px 0 12px 52px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .tweet-content a {
+            color: #1d9bf0;
+            text-decoration: none;
+        }
+        .tweet-content a:hover {
+            text-decoration: underline;
+        }
+
+        .tweet-media {
+            margin: 12px 0 12px 52px;
+            max-width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .tweet-media img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 20px;
+            border: 1px solid #eff3f4;
+        }
+
+        .engagement-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            margin-left: 52px;
+            max-width: 400px;
+            color: #536471;
+        }
+
+        .eng-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .eng-item i {
+            font-size: 1rem;
+        }
+        .eng-item:hover {
+            color: #1d9bf0;
+        }
+
+        /* modal overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: white;
+            border-radius: 28px;
+            max-width: 450px;
+            width: 90%;
+            padding: 24px;
+            text-align: center;
+        }
+        .modal-card input {
+            width: 100%;
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid #cfd9de;
+            border-radius: 40px;
+            font-size: 1rem;
+        }
+        .comment-section {
+            background: #f9f9f9;
+            margin-top: 8px;
+            padding: 12px;
+            border-radius: 20px;
+        }
+        .comment-input {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .comments-list {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .single-comment {
+            padding: 6px 0;
+            border-bottom: 1px solid #eef2f5;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #8899a6;
+            padding: 20px;
+            border-top: 1px solid #eff3f4;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="appRoot">
+    <div class="header">
+        <div class="logo-area">
+            <i class="fab fa-twitter logo-icon"></i>
+            <span class="logo-text">Twitter</span>
+        </div>
+        <div id="authWidget"></div>
+    </div>
+    <div id="mainContent"></div>
+    <footer>Credits to Hyawii — inspired by the birdsite ✨</footer>
+</div>
+
+<script>
+    // FIREBASE CONFIG (provided)
+    const firebaseConfig = {
+        apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
+        authDomain: "Twitska.firebaseapp.com",
+        databaseURL: "https://Twitter-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "Twitter",
+        storageBucket: "Twitter.firebasestorage.app",
+        messagingSenderId: "741872015483",
+        appId: "1:741872015483:web:f4e2f4019501d404cbaade",
+        measurementId: "G-KZQJNFTJD4"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    // Helper: generate unique ID
+    function generateId() {
+        return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
+    }
+
+    // Global state
+    let currentUser = null;        // firebase user object
+    let currentUserProfile = null;  // { username, uid, avatarInitial }
+    let tweetsRef = db.ref('tweets');
+    let usersRef = db.ref('users');
+    let commentsRef = db.ref('comments');
+    let likesRef = db.ref('likes');
+    let viewsRef = db.ref('views');   // store view counts per tweet
+
+    // Helper: update view count (increment when tweet displayed)
+    function registerView(tweetId) {
+        if (!currentUser) return;
+        const viewRef = viewsRef.child(tweetId).child(currentUser.uid);
+        viewRef.once('value', snap => {
+            if (!snap.exists()) {
+                viewRef.set(true);
+                viewsRef.child(tweetId).child('count').transaction(count => (count || 0) + 1);
+            }
+        });
+    }
+
+    // get view count
+    async function getViewCount(tweetId) {
+        const snap = await viewsRef.child(tweetId).child('count').once('value');
+        return snap.val() || 0;
+    }
+
+    // get like status & count
+    async function getLikeInfo(tweetId, userId) {
+        const likeSnap = await likesRef.child(tweetId).child(userId).once('value');
+        const liked = likeSnap.exists();
+        const countSnap = await likesRef.child(tweetId).child('count').once('value');
+        return { liked, count: countSnap.val() || 0 };
+    }
+
+    async function toggleLike(tweetId, userId) {
+        const likeNode = likesRef.child(tweetId).child(userId);
+        const countNode = likesRef.child(tweetId).child('count');
+        const snap = await likeNode.once('value');
+        if (snap.exists()) {
+            await likeNode.remove();
+            await countNode.transaction(c => (c || 1) - 1);
+        } else {
+            await likeNode.set(true);
+            await countNode.transaction(c => (c || 0) + 1);
+        }
+        renderFeed(); // refresh
+    }
+
+    // get comment count
+    async function getCommentCount(tweetId) {
+        const snap = await commentsRef.child(tweetId).once('value');
+        const comments = snap.val();
+        return comments ? Object.keys(comments).length : 0;
+    }
+
+    // show comment modal for a tweet
+    function showCommentsModal(tweetId, tweetData) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        let commentsHtml = '<div class="modal-card"><h3>💬 Comments</h3><div id="commentsList" class="comments-list">Loading...</div>';
+        commentsHtml += '<div class="comment-input"><input type="text" id="newCommentInput" placeholder="Write a reply..."><button id="postCommentBtn" class="btn-primary btn">Reply</button></div>';
+        commentsHtml += '<button id="closeModalBtn" class="btn-outline btn" style="margin-top:12px">Close</button></div>';
+        modal.innerHTML = commentsHtml;
+        document.body.appendChild(modal);
+
+        const loadComments = async () => {
+            const snap = await commentsRef.child(tweetId).once('value');
+            const all = snap.val() || {};
+            const commentListDiv = document.getElementById('commentsList');
+            if (!commentListDiv) return;
+            if (Object.keys(all).length === 0) {
+                commentListDiv.innerHTML = '<div style="text-align:center;padding:12px">No comments yet.</div>';
+                return;
+            }
+            let html = '';
+            for (let [cid, comment] of Object.entries(all)) {
+                const userSnap = await usersRef.child(comment.uid).once('value');
+                const username = userSnap.val()?.username || 'anonymous';
+                html += `<div class="single-comment"><strong>${escapeHtml(username)}</strong> ${escapeHtml(comment.text)}</div>`;
+            }
+            commentListDiv.innerHTML = html;
+        };
+        loadComments();
+
+        document.getElementById('postCommentBtn')?.addEventListener('click', async () => {
+            const input = document.getElementById('newCommentInput');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
+            const commentId = generateId();
+            await commentsRef.child(tweetId).child(commentId).set({
+                uid: currentUser.uid,
+                text: text,
+                timestamp: Date.now()
+            });
+            input.value = '';
+            loadComments();
+        });
+        document.getElementById('closeModalBtn')?.addEventListener('click', () => {
+            modal.remove();
+        });
+        modal.addEventListener('click', (e) => { if(e.target === modal) modal.remove(); });
+    }
+
+    // render feed with tweets, images, links, likes, comments, views
+    async function renderFeed() {
+        const container = document.getElementById('mainContent');
+        if (!container) return;
+        if (!currentUser) {
+            container.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitter</h3><p>Sign in to see the chirps</p></div>`;
+            return;
+        }
+        container.innerHTML = `<div class="compose-area">
+            <textarea id="tweetText" class="compose-input" placeholder="What's happening?"></textarea>
+            <div class="compose-footer">
+                <div class="post-actions">
+                    <input type="file" id="imageUpload" accept="image/*" style="display:none">
+                    <button id="attachImageBtn" class="icon-btn"><i class="fas fa-image"></i></button>
+                </div>
+                <button id="publishTweetBtn" class="tweet-btn">Post</button>
+            </div>
+            <div id="imagePreview" style="margin-top:8px; font-size:12px; color:#1d9bf0"></div>
+        </div><div class="feed" id="feedList">Loading tweets...</div>`;
+
+        // image upload logic
+        let selectedImageFile = null;
+        const imgInput = document.getElementById('imageUpload');
+        const attachBtn = document.getElementById('attachImageBtn');
+        const previewDiv = document.getElementById('imagePreview');
+        attachBtn.onclick = () => imgInput.click();
+        imgInput.onchange = (e) => {
+            if (e.target.files.length) {
+                selectedImageFile = e.target.files[0];
+                previewDiv.innerHTML = `📷 Image selected: ${selectedImageFile.name}`;
+            } else {
+                selectedImageFile = null;
+                previewDiv.innerHTML = '';
+            }
+        };
+        document.getElementById('publishTweetBtn').onclick = async () => {
+            const textArea = document.getElementById('tweetText');
+            const content = textArea.value.trim();
+            if (!content && !selectedImageFile) return;
+            let imageUrl = null;
+            if (selectedImageFile) {
+                const storageRef = storage.ref(`tweet_images/${generateId()}_${selectedImageFile.name}`);
+                const uploadTask = await storageRef.put(selectedImageFile);
+                imageUrl = await storageRef.getDownloadURL();
+            }
+            const tweetId = generateId();
+            await tweetsRef.child(tweetId).set({
+                uid: currentUser.uid,
+                content: content,
+                imageUrl: imageUrl,
+                timestamp: Date.now()
+            });
+            textArea.value = '';
+            selectedImageFile = null;
+            if(previewDiv) previewDiv.innerHTML = '';
+            imgInput.value = '';
+            renderFeed();
+        };
+
+        // load tweets
+        const snapshot = await tweetsRef.orderByChild('timestamp').once('value');
+        const tweets = snapshot.val() || {};
+        const tweetsArray = Object.entries(tweets).sort((a,b) => b[1].timestamp - a[1].timestamp);
+        const feedDiv = document.getElementById('feedList');
+        if(tweetsArray.length === 0) feedDiv.innerHTML = '<div style="padding:40px;text-align:center">No tweets yet. Be the first!</div>';
+        else {
+            let feedHtml = '';
+            for (let [tid, tweet] of tweetsArray) {
+                const userSnap = await usersRef.child(tweet.uid).once('value');
+                const profile = userSnap.val() || { username: 'unknown', avatarInitial: '?' };
+                const username = profile.username || 'twitizen';
+                const avatarLetter = username.charAt(0).toUpperCase();
+                const timeAgo = new Date(tweet.timestamp).toLocaleString();
+                const { liked, count: likeCount } = await getLikeInfo(tid, currentUser.uid);
+                const commentCount = await getCommentCount(tid);
+                const viewCount = await getViewCount(tid);
+                // Process links in content: blue clickable
+                let processedContent = escapeHtml(tweet.content || '');
+                processedContent = processedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+                feedHtml += `<div class="tweet-card" data-tweet-id="${tid}">
+                    <div class="tweet-header">
+                        <div class="tweet-avatar">${escapeHtml(avatarLetter)}</div>
+                        <div class="tweet-name-area">
+                            <div class="tweet-name-row">
+                                <span class="tweet-username">${escapeHtml(username)}</span>
+                                <i class="fas fa-check-circle verified-icon"></i>
+                                <span class="tweet-time">${escapeHtml(timeAgo)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tweet-content">${processedContent}</div>
+                    ${tweet.imageUrl ? `<div class="tweet-media"><img src="${tweet.imageUrl}" alt="media" loading="lazy"></div>` : ''}
+                    <div class="engagement-bar">
+                        <div class="eng-item comment-eng" data-tweetid="${tid}"><i class="far fa-comment"></i> ${commentCount}</div>
+                        <div class="eng-item like-eng" data-tweetid="${tid}" data-liked="${liked}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}" style="color:${liked ? '#f91880' : ''}"></i> ${likeCount}</div>
+                        <div class="eng-item"><i class="far fa-eye"></i> ${viewCount}</div>
+                        <div class="eng-item"><i class="fas fa-retweet"></i> 0</div>
+                    </div>
+                </div>`;
+            }
+            feedDiv.innerHTML = feedHtml;
+            // attach comment & like events
+            document.querySelectorAll('.comment-eng').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const tid = el.getAttribute('data-tweetid');
+                    const tweetData = tweets[tid];
+                    if(tweetData) showCommentsModal(tid, tweetData);
+                });
+            });
+            document.querySelectorAll('.like-eng').forEach(el => {
+                el.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const tid = el.getAttribute('data-tweetid');
+                    await toggleLike(tid, currentUser.uid);
+                });
+            });
+            // register views for each tweet displayed
+            for(let [tid] of tweetsArray) {
+                registerView(tid);
+            }
+        }
+    }
+
+    // username edit modal (persist)
+    async function showEditUsernameModal() {
+        if(!currentUser) return;
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `<div class="modal-card">
+            <h3>✏️ Change username</h3>
+            <input type="text" id="newUsername" placeholder="New username" value="${currentUserProfile?.username || ''}">
+            <button id="saveUsernameBtn" class="btn-primary btn">Save</button>
+            <button id="cancelUsernameBtn" class="btn-outline btn">Cancel</button>
+        </div>`;
+        document.body.appendChild(modal);
+        const saveBtn = modal.querySelector('#saveUsernameBtn');
+        const cancelBtn = modal.querySelector('#cancelUsernameBtn');
+        const inputField = modal.querySelector('#newUsername');
+        saveBtn.onclick = async () => {
+            let newName = inputField.value.trim();
+            if(newName.length < 2) newName = "twitizen";
+            await usersRef.child(currentUser.uid).update({ username: newName, avatarInitial: newName.charAt(0) });
+            currentUserProfile.username = newName;
+            currentUserProfile.avatarInitial = newName.charAt(0);
+            updateAuthUI();
+            renderFeed();
+            modal.remove();
+        };
+        cancelBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+    }
+
+    // update header and user panel
+    function updateAuthUI() {
+        const authDiv = document.getElementById('authWidget');
+        const mainDiv = document.getElementById('mainContent');
+        if(!authDiv) return;
+        if(!currentUser) {
+            authDiv.innerHTML = `<div class="auth-buttons"><button id="signInBtn" class="btn btn-primary">Sign in</button><button id="signUpBtn" class="btn btn-outline">Sign up</button></div>`;
+            document.getElementById('signInBtn')?.addEventListener('click', () => showAuthModal('login'));
+            document.getElementById('signUpBtn')?.addEventListener('click', () => showAuthModal('register'));
+            if(mainDiv) mainDiv.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitter</h3><p>Sign in to see the chirps</p></div>`;
+            return;
+        }
+        // logged in user panel
+        const usernameDisplay = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'User';
+        authDiv.innerHTML = `<div class="user-panel" style="width:100%; background:#fff; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+            <div class="user-info">
+                <div class="avatar">${(currentUserProfile?.avatarInitial || usernameDisplay.charAt(0)).toUpperCase()}</div>
+                <div><span class="username-display">@${escapeHtml(usernameDisplay)} <i class="fas fa-check-circle verified-badge"></i></span>
+                <button id="editUsernameBtn" class="edit-username-btn"><i class="fas fa-pen"></i> edit</button></div>
+            </div>
+            <button id="logoutBtn" class="btn-outline btn">Sign out</button>
+        </div>`;
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            await auth.signOut();
+            currentUser = null;
+            currentUserProfile = null;
+            updateAuthUI();
+            if(mainDiv) mainDiv.innerHTML = '';
+        });
+        document.getElementById('editUsernameBtn')?.addEventListener('click', showEditUsernameModal);
+        renderFeed();
+    }
+
+    async function loadUserProfile(uid) {
+        const snap = await usersRef.child(uid).once('value');
+        if(snap.exists()) return snap.val();
+        const defaultName = uid.slice(0,6);
+        const profile = { username: defaultName, avatarInitial: defaultName.charAt(0) };
+        await usersRef.child(uid).set(profile);
+        return profile;
+    }
+
+    auth.onAuthStateChanged(async (user) => {
+        if(user) {
+            currentUser = user;
+            currentUserProfile = await loadUserProfile(user.uid);
+            updateAuthUI();
+        } else {
+            currentUser = null;
+            currentUserProfile = null;
+            updateAuthUI();
+        }
+    });
+
+    // auth modal for login/register
+    function showAuthModal(mode) {
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal';
+        modalDiv.style.display = 'flex';
+        const isLogin = mode === 'login';
+        modalDiv.innerHTML = `<div class="modal-card">
+            <h2>${isLogin ? 'Sign in' : 'Create account'}</h2>
+            <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
+            <input type="password" id="authPassword" placeholder="Password">
+            <button id="authSubmitBtn" class="btn-primary btn">${isLogin ? 'Login' : 'Sign up'}</button>
+            <button id="closeAuthModal" class="btn-outline btn" style="margin-top:8px">Cancel</button>
+        </div>`;
+        document.body.appendChild(modalDiv);
+        const submitBtn = modalDiv.querySelector('#authSubmitBtn');
+        submitBtn.onclick = async () => {
+            const email = modalDiv.querySelector('#authEmail').value;
+            const pwd = modalDiv.querySelector('#authPassword').value;
+            try {
+                if(isLogin) await auth.signInWithEmailAndPassword(email, pwd);
+                else await auth.createUserWithEmailAndPassword(email, pwd);
+                modalDiv.remove();
+            } catch(err) { alert("Error: "+err.message); }
+        };
+        modalDiv.querySelector('#closeAuthModal').onclick = () => modalDiv.remove();
+        modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    // initial empty container
+    document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitter...</div>';
+</script>
+</body>
+</html>
