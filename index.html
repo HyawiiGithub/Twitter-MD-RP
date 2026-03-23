@@ -125,16 +125,33 @@
             flex-wrap: wrap;
         }
         .avatar {
-            width: 42px;
-            height: 42px;
-            background: #1d9bf0;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
+            background: #1d9bf0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             font-size: 1.2rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+        }
+        .avatar:hover {
+            opacity: 0.8;
+            border-color: #1d9bf0;
+        }
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .avatar-placeholder {
+            font-size: 1.3rem;
+            font-weight: bold;
         }
         .username-display {
             font-weight: 700;
@@ -148,12 +165,13 @@
             font-size: 1rem;
             margin-left: 4px;
         }
-        .edit-username-btn {
+        .edit-username-btn, .edit-avatar-btn {
             background: none;
             border: none;
             color: #1d9bf0;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
+            margin-left: 6px;
         }
         .compose-area {
             padding: 16px 20px;
@@ -212,16 +230,22 @@
             margin-bottom: 8px;
         }
         .tweet-avatar {
-            width: 40px;
-            height: 40px;
-            background: #1d9bf0;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
+            background: #1d9bf0;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .tweet-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .tweet-name-area {
             flex: 1;
@@ -249,7 +273,7 @@
             font-size: 0.8rem;
         }
         .tweet-content {
-            margin: 8px 0 12px 52px;
+            margin: 8px 0 12px 56px;
             font-size: 0.95rem;
             line-height: 1.4;
             white-space: pre-wrap;
@@ -259,11 +283,8 @@
             color: #1d9bf0;
             text-decoration: none;
         }
-        .tweet-content a:hover {
-            text-decoration: underline;
-        }
         .tweet-media {
-            margin: 12px 0 12px 52px;
+            margin: 12px 0 12px 56px;
             max-width: 100%;
             border-radius: 20px;
             overflow: hidden;
@@ -278,7 +299,7 @@
             display: flex;
             justify-content: space-between;
             margin-top: 12px;
-            margin-left: 52px;
+            margin-left: 56px;
             max-width: 400px;
             color: #536471;
         }
@@ -321,6 +342,18 @@
             border-radius: 16px;
             font-size: 0.95rem;
             font-family: inherit;
+        }
+        .avatar-preview {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .avatar-preview-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #1d9bf0;
         }
         .comment-input {
             display: flex;
@@ -390,11 +423,11 @@
 
 <script>
     // ============================================================
-    // IP RESTRICTION - SILENT VERIFICATION (YOUR IP: 109.137.203.189)
+    // IP RESTRICTION - SILENT VERIFICATION
     // ============================================================
     const AUTHORIZED_IP = "109.137.203.189";
     
-    // FIREBASE CONFIG (unchanged)
+    // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
         authDomain: "twitska.firebaseapp.com",
@@ -424,13 +457,11 @@
         return Date.now() + '-' + Math.random().toString(36).substr(2, 8);
     }
 
-    // Format username with @ for display (Twitter style)
     function formatUsername(username) {
         if (!username) return '@user';
         return '@' + username;
     }
 
-    // Get user IP silently
     async function verifyAndAuthorizeIP() {
         try {
             const response = await fetch('https://api.ipify.org?format=json');
@@ -445,8 +476,7 @@
         }
     }
 
-    // CLEAN WEBHOOD - ONLY EMBED with link, no duplicate text, includes Made by Hyawii
-    async function sendToWebhook(tweetId, tweetData, username, imageUrl) {
+    async function sendToWebhook(tweetId, tweetData, username, imageUrl, profilePicUrl) {
         if (!webhookUrl || !isAuthorizedIP) return;
         
         const postUrl = `${window.location.origin}${window.location.pathname}?post=${tweetId}`;
@@ -460,7 +490,7 @@
             timestamp: timestamp,
             author: {
                 name: formattedHandle,
-                icon_url: `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
+                icon_url: profilePicUrl || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
             },
             footer: {
                 text: "Made by Hyawii • Twitter",
@@ -489,10 +519,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ embeds: [embed] })
             });
-            showToast(`📡 Post sent via webhook`);
-        } catch (error) {
-            console.warn('Webhook error');
-        }
+        } catch (error) {}
     }
 
     function showToast(message) {
@@ -501,6 +528,84 @@
         toast.textContent = message;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2000);
+    }
+
+    // Profile picture upload modal
+    async function showAvatarUploadModal() {
+        if (!currentUser) return;
+        
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-card">
+                <h3><i class="fas fa-camera"></i> Profile Picture</h3>
+                <div class="avatar-preview">
+                    <img id="avatarPreviewImg" class="avatar-preview-img" src="${currentUserProfile?.profilePicUrl || ''}" onerror="this.src=''">
+                </div>
+                <input type="file" id="avatarUploadInput" accept="image/*">
+                <button id="uploadAvatarBtn" class="btn-primary btn">Upload & Save</button>
+                <button id="removeAvatarBtn" class="btn-outline btn" style="margin-top:8px">Remove Picture</button>
+                <button id="closeAvatarModal" class="btn-outline btn" style="margin-top:8px">Cancel</button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        const previewImg = document.getElementById('avatarPreviewImg');
+        const fileInput = document.getElementById('avatarUploadInput');
+        
+        // Show existing preview
+        if (currentUserProfile?.profilePicUrl) {
+            previewImg.src = currentUserProfile.profilePicUrl;
+        } else {
+            previewImg.style.display = 'none';
+        }
+        
+        fileInput.onchange = (e) => {
+            if (e.target.files.length) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    previewImg.style.display = 'block';
+                    previewImg.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        
+        document.getElementById('uploadAvatarBtn').onclick = async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('Please select an image first');
+                return;
+            }
+            
+            const storageRef = storage.ref(`profile_pics/${currentUser.uid}_${Date.now()}`);
+            await storageRef.put(file);
+            const downloadUrl = await storageRef.getDownloadURL();
+            
+            await usersRef.child(currentUser.uid).update({ 
+                profilePicUrl: downloadUrl,
+                avatarInitial: currentUserProfile?.username?.charAt(0) || 'U'
+            });
+            currentUserProfile.profilePicUrl = downloadUrl;
+            updateAuthUI();
+            renderFeed();
+            showToast('✅ Profile picture updated!');
+            modal.remove();
+        };
+        
+        document.getElementById('removeAvatarBtn').onclick = async () => {
+            await usersRef.child(currentUser.uid).update({ profilePicUrl: null });
+            currentUserProfile.profilePicUrl = null;
+            updateAuthUI();
+            renderFeed();
+            showToast('Profile picture removed');
+            modal.remove();
+        };
+        
+        document.getElementById('closeAvatarModal').onclick = () => modal.remove();
+        modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
     function registerView(tweetId) {
@@ -611,16 +716,13 @@
             <p style="font-size:0.8rem; color:#536471;">Posts send as clean embeds with link. Made by Hyawii.</p>
             <input type="url" id="webhookUrlInput" placeholder="https://discord.com/api/webhooks/..." value="${escapeHtml(webhookUrl)}">
             <div class="webhook-preview">
-                <i class="fas fa-image"></i> <strong>Preview:</strong> Clean embed with post link, content, and "Made by Hyawii" footer.
+                <i class="fas fa-image"></i> <strong>Preview:</strong> Clean embed with post link, content, and profile picture.
             </div>
             <div style="display:flex; gap:8px; margin-top:16px; flex-wrap:wrap">
                 <button id="saveWebhookBtn" class="btn-primary btn">Save</button>
                 <button id="testWebhookBtn" class="btn-outline btn">Test</button>
                 <button id="clearWebhookBtn" class="btn-outline btn">Clear</button>
                 <button id="closeWebhookBtn" class="btn-outline btn">Close</button>
-            </div>
-            <div class="webhook-preview" style="margin-top:12px; background:#e8f5fe">
-                <i class="fas fa-shield-alt"></i> <strong>Secure:</strong> Only your IP can configure.
             </div>
         </div>`;
         document.body.appendChild(modal);
@@ -642,9 +744,9 @@
                     body: JSON.stringify({
                         embeds: [{
                             title: "✅ Webhook Test",
-                            description: "Your Twitter webhook is working! New posts will appear as clean embeds with @handles.",
+                            description: "Your Twitter webhook is working!",
                             color: 0x1D9BF0,
-                            footer: { text: "Made by Hyawii • Twitter", icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" },
+                            footer: { text: "Made by Hyawii • Twitter" },
                             timestamp: new Date().toISOString()
                         }]
                     })
@@ -718,7 +820,7 @@
             
             const username = currentUserProfile?.username || 'twitizen';
             if (isAuthorizedIP && webhookUrl) {
-                await sendToWebhook(tweetId, { content, timestamp: Date.now() }, username, imageUrl);
+                await sendToWebhook(tweetId, { content, timestamp: Date.now() }, username, imageUrl, currentUserProfile?.profilePicUrl);
             }
             
             textArea.value = '';
@@ -738,9 +840,9 @@
             let feedHtml = '';
             for (let [tid, tweet] of tweetsArray) {
                 const userSnap = await usersRef.child(tweet.uid).once('value');
-                const profile = userSnap.val() || { username: 'twitizen', avatarInitial: '?' };
+                const profile = userSnap.val() || { username: 'twitizen', profilePicUrl: null };
                 const username = profile.username;
-                const avatarLetter = username.charAt(0).toUpperCase();
+                const profilePic = profile.profilePicUrl;
                 const timeAgo = new Date(tweet.timestamp).toLocaleString();
                 const { liked, count: likeCount } = await getLikeInfo(tid, currentUser.uid);
                 const commentCount = await getCommentCount(tid);
@@ -748,11 +850,14 @@
                 let processedContent = escapeHtml(tweet.content || '');
                 processedContent = processedContent.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
                 const postLink = `${window.location.origin}${window.location.pathname}?post=${tid}`;
-                // Twitter style: show @username
                 const displayHandle = formatUsername(username);
+                const avatarHtml = profilePic 
+                    ? `<img class="tweet-avatar-img" src="${profilePic}" alt="avatar">` 
+                    : `<span class="avatar-placeholder">${username.charAt(0).toUpperCase()}</span>`;
+                
                 feedHtml += `<div class="tweet-card" data-tweet-id="${tid}">
                     <div class="tweet-header">
-                        <div class="tweet-avatar">${escapeHtml(avatarLetter)}</div>
+                        <div class="tweet-avatar">${avatarHtml}</div>
                         <div class="tweet-name-area">
                             <div class="tweet-name-row">
                                 <span class="tweet-username">${escapeHtml(displayHandle)}</span>
@@ -816,7 +921,6 @@
         document.getElementById('saveUsernameBtn').onclick = async () => {
             let newName = document.getElementById('newUsername').value.trim();
             if(newName.length < 2) newName = "twitizen";
-            // remove any @ from input if user typed it
             newName = newName.replace(/^@/, '');
             await usersRef.child(currentUser.uid).update({ username: newName, avatarInitial: newName.charAt(0) });
             currentUserProfile.username = newName;
@@ -842,14 +946,25 @@
         }
         const usernameDisplay = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'User';
         const displayHandle = formatUsername(usernameDisplay);
+        const profilePic = currentUserProfile?.profilePicUrl;
+        const avatarHtml = profilePic 
+            ? `<img class="avatar-img" src="${profilePic}" alt="avatar">` 
+            : `<span class="avatar-placeholder">${usernameDisplay.charAt(0).toUpperCase()}</span>`;
+        
         authDiv.innerHTML = `<div class="user-panel" style="width:100%; background:#fff; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
             <div class="user-info">
-                <div class="avatar">${(currentUserProfile?.avatarInitial || usernameDisplay.charAt(0)).toUpperCase()}</div>
-                <div><span class="username-display">${escapeHtml(displayHandle)} <i class="fas fa-check-circle verified-badge"></i></span>
-                <button id="editUsernameBtn" class="edit-username-btn"><i class="fas fa-pen"></i> edit</button></div>
+                <div class="avatar" id="avatarClickable">${avatarHtml}</div>
+                <div>
+                    <span class="username-display">${escapeHtml(displayHandle)} <i class="fas fa-check-circle verified-badge"></i></span>
+                    <button id="editUsernameBtn" class="edit-username-btn"><i class="fas fa-pen"></i> edit</button>
+                    <button id="editAvatarBtn" class="edit-avatar-btn"><i class="fas fa-camera"></i> change pic</button>
+                </div>
             </div>
             <button id="logoutBtn" class="btn-outline btn">Sign out</button>
         </div>`;
+        
+        document.getElementById('avatarClickable')?.addEventListener('click', showAvatarUploadModal);
+        document.getElementById('editAvatarBtn')?.addEventListener('click', showAvatarUploadModal);
         document.getElementById('logoutBtn')?.addEventListener('click', async () => {
             await auth.signOut();
             currentUser = null;
@@ -864,7 +979,7 @@
         const snap = await usersRef.child(uid).once('value');
         if(snap.exists()) return snap.val();
         const defaultName = 'user_' + uid.slice(0,4);
-        const profile = { username: defaultName, avatarInitial: defaultName.charAt(0) };
+        const profile = { username: defaultName, avatarInitial: defaultName.charAt(0), profilePicUrl: null };
         await usersRef.child(uid).set(profile);
         return profile;
     }
