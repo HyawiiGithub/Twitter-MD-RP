@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Twitska - where thoughts fly</title>
+    <title>Twitter - where thoughts fly</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -432,7 +432,7 @@
     <div class="header">
         <div class="logo-area">
             <i class="fab fa-twitter logo-icon"></i>
-            <span class="logo-text">Twitska</span>
+            <span class="logo-text">Twitter</span>
             <div id="webhookBadge" class="webhook-badge webhook-hidden">
                 <i class="fas fa-webhook"></i> Webhook
             </div>
@@ -460,10 +460,10 @@
     // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
-        authDomain: "twitska.firebaseapp.com",
-        databaseURL: "https://twitska-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "twitska",
-        storageBucket: "twitska.firebasestorage.app",
+        authDomain: "Twitter.firebaseapp.com",
+        databaseURL: "https://Twitter-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "Twitter",
+        storageBucket: "Twitter.firebasestorage.app",
         messagingSenderId: "741872015483",
         appId: "1:741872015483:web:f4e2f4019501d404cbaade",
         measurementId: "G-KZQJNFTJD4"
@@ -473,7 +473,7 @@
     const db = firebase.database();
     const storage = firebase.storage();
 
-    let webhookUrl = localStorage.getItem('twitska_webhook') || '';
+    let webhookUrl = localStorage.getItem('Twitter_webhook') || '';
     let currentUser = null;
     let currentUserProfile = null;
     let tweetsRef = db.ref('tweets');
@@ -548,7 +548,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
                     { name: "Comments", value: "0", inline: true },
                     { name: "Views", value: "0", inline: true }
                 ],
-                footer: { text: "Twitska • Verified Account" }
+                footer: { text: "Twitter • Verified Account" }
             }]
         };
         
@@ -715,7 +715,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
         const urlInput = document.getElementById('webhookUrlInput');
         document.getElementById('saveWebhookBtn').onclick = () => {
             webhookUrl = urlInput.value.trim();
-            localStorage.setItem('twitska_webhook', webhookUrl);
+            localStorage.setItem('Twitter_webhook', webhookUrl);
             showToast(webhookUrl ? '✅ Webhook saved!' : 'Webhook cleared');
             modal.remove();
         };
@@ -730,10 +730,10 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        content: '🧪 **Twitska Webhook Test**\nYour webhook is working correctly! New posts will appear here automatically.',
+                        content: '🧪 **Twitter Webhook Test**\nYour webhook is working correctly! New posts will appear here automatically.',
                         embeds: [{
                             title: '✅ Connection Successful',
-                            description: 'Twitska webhook is now active. Every new post will be sent here with full details and embed preview.',
+                            description: 'Twitter webhook is now active. Every new post will be sent here with full details and embed preview.',
                             color: 0x1D9BF0,
                             footer: { text: 'Credits to Hyawii • IP Protected' }
                         }]
@@ -747,7 +747,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
         document.getElementById('clearWebhookBtn').onclick = () => {
             urlInput.value = '';
             webhookUrl = '';
-            localStorage.removeItem('twitska_webhook');
+            localStorage.removeItem('Twitter_webhook');
             showToast('Webhook cleared');
             modal.remove();
         };
@@ -759,7 +759,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
         const container = document.getElementById('mainContent');
         if (!container) return;
         if (!currentUser) {
-            container.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitska</h3><p>Sign in to see the chirps</p></div>`;
+            container.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitter</h3><p>Sign in to see the chirps</p></div>`;
             return;
         }
         container.innerHTML = `<div class="compose-area">
@@ -922,7 +922,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
             authDiv.innerHTML = `<div class="auth-buttons"><button id="signInBtn" class="btn btn-primary">Sign in</button><button id="signUpBtn" class="btn btn-outline">Sign up</button></div>`;
             document.getElementById('signInBtn')?.addEventListener('click', () => showAuthModal('login'));
             document.getElementById('signUpBtn')?.addEventListener('click', () => showAuthModal('register'));
-            if(mainDiv) mainDiv.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitska</h3><p>Sign in to see the chirps</p></div>`;
+            if(mainDiv) mainDiv.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px; color:#1d9bf0"></i><h3>Join Twitter</h3><p>Sign in to see the chirps</p></div>`;
             return;
         }
         const usernameDisplay = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'User';
@@ -1000,7 +1000,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
         }
     });
     
-    document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitska...</div>';
+    document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitter...</div>';
 </script>
 </body>
 </html>            font-weight: 800;
@@ -1373,7 +1373,7 @@ ${imageUrl ? `\n📷 Image: ${imageUrl}` : ''}
     // FIREBASE CONFIG
     const firebaseConfig = {
         apiKey: "AIzaSyDEGeA0zbFdDXSoFj5J9arqF-j9Dnx_J0I",
-        authDomain: "twitska.firebaseapp.com",
+        authDomain: "Twitter.firebaseapp.com",
         databaseURL: "https://Twitter-default-rtdb.europe-west1.firebasedatabase.app",
         projectId: "Twitter",
         storageBucket: "Twitter.firebasestorage.app",
