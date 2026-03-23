@@ -17,7 +17,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
-        /* Light Mode (Default) */
         :root {
             --bg-primary: #ffffff;
             --bg-secondary: #f5f8fa;
@@ -40,7 +39,6 @@
             --webhook-badge-bg: #e8f5fe;
         }
         
-        /* Dark Mode */
         body.dark-mode {
             --bg-primary: #000000;
             --bg-secondary: #000000;
@@ -64,47 +62,13 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-secondary); 
-            color: var(--text-primary); 
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-        .app-container { 
-            max-width: 700px; 
-            margin: 0 auto; 
-            background: var(--bg-primary); 
-            min-height: 100vh; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.05); 
-        }
-        .header { 
-            background: var(--bg-primary); 
-            backdrop-filter: blur(10px); 
-            border-bottom: 1px solid var(--border-color); 
-            padding: 14px 20px; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.2s ease, color 0.2s ease; }
+        .app-container { max-width: 700px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        .header { background: var(--bg-primary); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .logo-icon { font-size: 28px; color: #1d9bf0; }
         .logo-text { font-weight: 800; font-size: 1.5rem; background: linear-gradient(135deg, #1d9bf0, #0a6cbd); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .dark-mode-toggle {
-            background: var(--webhook-badge-bg);
-            border: none;
-            border-radius: 40px;
-            padding: 8px 12px;
-            cursor: pointer;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.2s;
-        }
+        .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .dark-mode-toggle:hover { opacity: 0.8; }
         .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .webhook-badge:hover { background: #d4eaf8; }
@@ -121,6 +85,7 @@
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem; overflow: hidden; cursor: pointer; transition: 0.2s; border: 2px solid transparent; flex-shrink: 0; }
         .avatar:hover { opacity: 0.8; border-color: var(--button-primary); }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-placeholder { font-size: 1.3rem; font-weight: bold; }
         .username-display { font-weight: 700; background: var(--border-light); padding: 4px 12px; border-radius: 40px; font-size: 0.9rem; color: var(--text-primary); }
         .verified-badge { color: var(--verified-color); font-size: 1rem; margin-left: 4px; }
         .edit-username-btn, .edit-avatar-btn { background: none; border: none; color: var(--button-primary); cursor: pointer; font-size: 0.7rem; margin-left: 6px; }
@@ -155,12 +120,17 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
         .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); }
         .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; font-size: 0.95rem; font-family: inherit; background: var(--input-bg); color: var(--text-primary); }
-        .modal-card input::placeholder, .modal-card textarea::placeholder { color: var(--text-secondary); }
         .crop-container { max-width: 100%; max-height: 400px; margin: 16px 0; }
         .avatar-preview { display: flex; justify-content: center; gap: 16px; margin: 16px 0; }
         .avatar-preview-img { width: 80px; height: 80px; border-radius: 50%; background-size: cover; background-position: center; border: 3px solid var(--button-primary); }
-        .comments-list { font-size: 0.85rem; margin-top: 8px; max-height: 200px; overflow-y: auto; }
-        .single-comment { padding: 6px 0; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        .comments-list { font-size: 0.9rem; margin-top: 16px; max-height: 400px; overflow-y: auto; }
+        .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; }
+        .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem; overflow: hidden; flex-shrink: 0; }
+        .comment-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        .comment-content { flex: 1; }
+        .comment-username { font-weight: 700; font-size: 0.85rem; }
+        .comment-text { font-size: 0.85rem; margin-top: 4px; color: var(--text-primary); }
+        .comment-time { font-size: 0.7rem; color: var(--text-secondary); margin-left: 8px; }
         .webhook-preview { background: var(--retweet-bg); border-radius: 16px; padding: 12px; margin-top: 12px; font-size: 0.8rem; color: var(--text-secondary); }
         footer { text-align: center; font-size: 0.75rem; color: var(--text-secondary); padding: 20px; border-top: 1px solid var(--border-color); }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--button-primary); color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: fadeInOut 2s ease; }
@@ -179,8 +149,8 @@
             <span class="logo-text">Twitter</span>
             <div id="webhookBadge" class="webhook-badge webhook-hidden"><i class="fas fa-webhook"></i> Webhook</div>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <button id="darkModeToggle" class="dark-mode-toggle"><i class="fas fa-moon"></i> <span id="darkModeText">Dark</span></button>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="darkModeToggle" class="dark-mode-toggle"><i class="fas fa-moon"></i> Dark</button>
             <div id="authWidget"></div>
         </div>
     </div>
@@ -194,9 +164,9 @@
         const savedMode = localStorage.getItem('twitter_dark_mode');
         if (savedMode === 'dark') {
             document.body.classList.add('dark-mode');
-            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-sun"></i> Light';
+            document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i> Light';
         } else {
-            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-moon"></i> Dark';
+            document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-moon"></i> Dark';
         }
     }
     
@@ -205,9 +175,9 @@
         const isDark = document.body.classList.contains('dark-mode');
         localStorage.setItem('twitter_dark_mode', isDark ? 'dark' : 'light');
         if (isDark) {
-            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-sun"></i> Light';
+            document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i> Light';
         } else {
-            document.getElementById('darkModeText').innerHTML = '<i class="fas fa-moon"></i> Dark';
+            document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-moon"></i> Dark';
         }
     }
     
@@ -263,19 +233,59 @@
         const timestamp = new Date().toISOString();
         const formattedHandle = `@${username}`;
         let title = "", description = "", color = 0x1D9BF0;
+        
         switch(type) {
-            case 'tweet': title = `🕊️ New post from ${formattedHandle}`; description = data.content || "No text content"; break;
-            case 'reply': title = `💬 Reply from ${formattedHandle}`; description = `Replying to: ${extraInfo.originalAuthor}\n\n${data.content || ""}`; color = 0x5865F2; break;
-            case 'retweet': title = `🔁 Retweet by ${formattedHandle}`; description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n"${extraInfo.originalContent?.substring(0, 150) || ""}"`; if(data.content) description += `\n\nWith comment: "${data.content.substring(0, 100)}"`; color = 0x00BA7C; break;
+            case 'tweet': 
+                title = `🕊️ New post from ${formattedHandle}`; 
+                description = data.content || "No text content"; 
+                break;
+            case 'reply': 
+                title = `💬 Reply from ${formattedHandle}`; 
+                description = `**Replying to:** ${extraInfo.originalAuthor}\n\n**Original message:** "${extraInfo.originalContent?.substring(0, 200) || ""}"\n\n**Reply:** ${data.content || ""}`; 
+                color = 0x5865F2; 
+                break;
+            case 'retweet': 
+                title = `🔁 Retweet by ${formattedHandle}`; 
+                description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n**Original post:** "${extraInfo.originalContent?.substring(0, 150) || ""}"`; 
+                if(data.content) description += `\n\n**With comment:** "${data.content.substring(0, 100)}"`;
+                color = 0x00BA7C; 
+                break;
         }
-        const embed = { title, url: postUrl, color, timestamp, author: { name: formattedHandle, icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}` }, footer: { text: `Made by Hyawii • Twitter`, icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" }, fields: [{ name: "📝 Content", value: description.substring(0, 256), inline: false }, { name: "🔗 View", value: `[Click to open](${postUrl})`, inline: false }] };
+        
+        const embed = { 
+            title, 
+            url: postUrl, 
+            color, 
+            timestamp, 
+            author: { 
+                name: formattedHandle, 
+                icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
+            }, 
+            footer: { 
+                text: `Made by Hyawii • Twitter`, 
+                icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
+            }, 
+            fields: [
+                { name: "📝 Content", value: description.substring(0, 1024), inline: false }, 
+                { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }
+            ] 
+        };
+        
         if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
-        try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
+        
+        try { 
+            await fetch(webhookUrl, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ embeds: [embed] }) 
+            });
+        } catch(e) {}
     }
 
     function setupWebhookListener() {
         if (webhookListenerActive) return;
         webhookListenerActive = true;
+        
         tweetsRef.orderByChild('timestamp').limitToLast(1).on('child_added', async (snapshot) => {
             if (!webhookUrl) return;
             const tweet = snapshot.val();
@@ -288,6 +298,7 @@
                 await sendToWebhook('tweet', { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl }, userProfile.username, userProfile.profilePicUrl, {});
             }
         });
+        
         commentsRef.on('child_added', async (commentSnapshot) => {
             if (!webhookUrl) return;
             const tweetId = commentSnapshot.key;
@@ -303,7 +314,12 @@
                     const originalTweet = tweetSnap.val();
                     const originalAuthorSnap = await usersRef.child(originalTweet?.uid).once('value');
                     const originalAuthor = originalAuthorSnap.val()?.username || 'unknown';
-                    await sendToWebhook('reply', { content: comment.text, tweetId: tweetId, imageUrl: null }, userProfile.username, userProfile.profilePicUrl, { originalAuthor: `@${originalAuthor}` });
+                    const originalContent = originalTweet?.content || '';
+                    await sendToWebhook('reply',
+                        { content: comment.text, tweetId: tweetId, imageUrl: null },
+                        userProfile.username, userProfile.profilePicUrl,
+                        { originalAuthor: `@${originalAuthor}`, originalContent: originalContent }
+                    );
                 }
             }
         });
@@ -311,7 +327,11 @@
 
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
 
-    async function uploadImage(file) { const storageRef = storage.ref(`tweet_images/${generateId()}_${file.name}`); await storageRef.put(file); return await storageRef.getDownloadURL(); }
+    async function uploadImage(file) { 
+        const storageRef = storage.ref(`tweet_images/${generateId()}_${file.name}`); 
+        await storageRef.put(file); 
+        return await storageRef.getDownloadURL(); 
+    }
 
     async function showAvatarUploadModal() {
         if (!currentUser) return;
@@ -320,11 +340,13 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-camera"></i> Profile Picture</h3><p>Upload and crop a square image</p><input type="file" id="avatarFileInput" accept="image/*"><div id="cropContainer" class="crop-container" style="display:none"><img id="cropImage" style="max-width:100%"></div><div id="previewContainer" class="avatar-preview" style="display:none"><div class="avatar-preview-img" id="previewCircle"></div></div><div class="button-group"><button id="cropSaveBtn" class="btn-primary btn" style="display:none">Save</button><button id="removeAvatarBtn" class="btn-outline btn">Remove</button><button id="closeAvatarModal" class="btn-outline btn">Cancel</button></div></div>`;
         document.body.appendChild(modal);
+        
         const fileInput = document.getElementById('avatarFileInput');
         const cropContainer = document.getElementById('cropContainer');
         const cropImage = document.getElementById('cropImage');
         const previewContainer = document.getElementById('previewContainer');
         const cropSaveBtn = document.getElementById('cropSaveBtn');
+        
         fileInput.onchange = (e) => {
             if (e.target.files.length) {
                 const reader = new FileReader();
@@ -372,21 +394,79 @@
     async function toggleLike(tweetId, userId) { const likeNode = likesRef.child(tweetId).child(userId); const countNode = likesRef.child(tweetId).child('count'); const snap = await likeNode.once('value'); if (snap.exists()) { await likeNode.remove(); await countNode.transaction(c => (c || 1) - 1); } else { await likeNode.set(true); await countNode.transaction(c => (c || 0) + 1); } renderFeed(); }
     async function getCommentCount(tweetId) { const snap = await commentsRef.child(tweetId).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     
-    async function showReplyModal(tweetId, originalUsername, originalContent) {
+    // Show full comments modal with all replies
+    async function showCommentsModal(tweetId, originalUsername, originalContent) {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="far fa-comment"></i> Reply to @${escapeHtml(originalUsername)}</h3><div style="background:var(--retweet-bg); padding:12px; border-radius:16px; margin-bottom:12px; color:var(--text-secondary);">${escapeHtml(originalContent?.substring(0, 100))}</div><textarea id="replyText" placeholder="Write your reply..." rows="3"></textarea><div class="button-group"><button id="submitReplyBtn" class="btn-primary btn">Post</button><button id="closeReplyModal" class="btn-outline btn">Cancel</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card">
+            <h3><i class="far fa-comment"></i> Replies to @${escapeHtml(originalUsername)}</h3>
+            <div style="background: var(--retweet-bg); padding: 12px; border-radius: 16px; margin-bottom: 16px; border-left: 3px solid var(--button-primary);">
+                <div style="font-weight: 600;">Original post:</div>
+                <div style="margin-top: 4px; color: var(--text-secondary);">${escapeHtml(originalContent?.substring(0, 150) || '')}</div>
+            </div>
+            <div id="commentsListFull" class="comments-list">Loading comments...</div>
+            <div style="margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                <textarea id="replyTextFull" placeholder="Write a reply..." rows="2" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary);"></textarea>
+                <div class="button-group" style="margin-top: 8px;">
+                    <button id="submitReplyFullBtn" class="btn-primary btn">Post Reply</button>
+                    <button id="closeCommentsModal" class="btn-outline btn">Close</button>
+                </div>
+            </div>
+        </div>`;
         document.body.appendChild(modal);
-        document.getElementById('submitReplyBtn').onclick = async () => {
-            const text = document.getElementById('replyText').value.trim();
+        
+        const loadComments = async () => {
+            const snap = await commentsRef.child(tweetId).once('value');
+            const all = snap.val() || {};
+            const commentsListDiv = document.getElementById('commentsListFull');
+            if (!commentsListDiv) return;
+            
+            if (Object.keys(all).length === 0) {
+                commentsListDiv.innerHTML = '<div style="text-align:center; padding:20px; color: var(--text-secondary);">No replies yet. Be the first to reply!</div>';
+                return;
+            }
+            
+            let html = '';
+            const sortedComments = Object.entries(all).sort((a, b) => b[1].timestamp - a[1].timestamp);
+            
+            for (let [cid, comment] of sortedComments) {
+                const userSnap = await usersRef.child(comment.uid).once('value');
+                const userProfile = userSnap.val() || { username: 'anonymous', profilePicUrl: null };
+                const username = userProfile.username;
+                const profilePic = userProfile.profilePicUrl;
+                const timeAgo = new Date(comment.timestamp).toLocaleString();
+                const avatarHtml = profilePic 
+                    ? `<img class="comment-avatar-img" src="${profilePic}" style="width:100%; height:100%; object-fit:cover;">` 
+                    : `<span style="font-size:0.8rem;">${username.charAt(0).toUpperCase()}</span>`;
+                
+                html += `<div class="single-comment">
+                    <div class="comment-avatar">${avatarHtml}</div>
+                    <div class="comment-content">
+                        <div>
+                            <span class="comment-username">${escapeHtml(formatUsername(username))}</span>
+                            <span class="comment-time">${escapeHtml(timeAgo)}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(comment.text)}</div>
+                    </div>
+                </div>`;
+            }
+            commentsListDiv.innerHTML = html;
+        };
+        
+        await loadComments();
+        
+        document.getElementById('submitReplyFullBtn').onclick = async () => {
+            const text = document.getElementById('replyTextFull').value.trim();
             if (!text) { showToast('Reply cannot be empty'); return; }
             await commentsRef.child(tweetId).child(generateId()).set({ uid: currentUser.uid, text: text, timestamp: Date.now() });
             showToast('💬 Reply posted!');
-            modal.remove();
+            document.getElementById('replyTextFull').value = '';
+            await loadComments();
             renderFeed();
         };
-        document.getElementById('closeReplyModal').onclick = () => modal.remove();
+        
+        document.getElementById('closeCommentsModal').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
 
@@ -395,11 +475,11 @@
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook</h3><p>All tweets from EVERY user are sent here automatically.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> Monitors: New Posts, Replies, Retweets from all users</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save & Activate</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook</h3><p>All tweets from EVERY user are sent here automatically.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> Monitors: New Posts, Replies (with original message), Retweets</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save & Activate</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
         document.getElementById('saveWebhookBtn').onclick = () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); showToast(webhookUrl ? '✅ Webhook saved & active!' : 'Webhook cleared'); if (webhookUrl) setupWebhookListener(); modal.remove(); };
-        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All tweets from all users will now be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
+        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All tweets, replies (with original message), and retweets will be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); showToast('Webhook cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
@@ -459,14 +539,15 @@
                     if (tweet.imageUrl) feedHtml += `<div class="tweet-media" onclick="showImageZoom('${tweet.imageUrl}')"><img src="${tweet.imageUrl}" loading="lazy"></div>`;
                 }
                 feedHtml += `<div class="engagement-bar">
-                    <div class="eng-item reply-eng" data-tweetid="${tid}" data-username="${escapeHtml(username)}" data-content="${escapeHtml(tweet.content || tweet.originalContent || '').substring(0, 100)}"><i class="far fa-comment"></i> ${commentCount}</div>
+                    <div class="eng-item comment-eng" data-tweetid="${tid}" data-username="${escapeHtml(username)}" data-content="${escapeHtml(tweet.content || '').substring(0, 150)}"><i class="far fa-comment"></i> ${commentCount}</div>
                     <div class="eng-item retweet-eng" data-tweetid="${tid}" data-original-id="${tweet.isRetweet ? tweet.originalTweetId : tid}" data-original-username="${tweet.isRetweet ? tweet.originalAuthor : username}" data-original-content="${escapeHtml((tweet.isRetweet ? tweet.originalContent : tweet.content) || '')}"><i class="fas fa-retweet"></i> 0</div>
                     <div class="eng-item like-eng" data-tweetid="${tid}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}" style="color:${liked ? 'var(--like-color)' : ''}"></i> ${likeCount}</div>
                     <div class="eng-item"><i class="far fa-eye"></i> ${viewCount}</div>
                 </div></div>`;
             }
             feedDiv.innerHTML = feedHtml;
-            document.querySelectorAll('.reply-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); const username = el.getAttribute('data-username'); const content = el.getAttribute('data-content'); showReplyModal(tid, username, content); }); });
+            
+            document.querySelectorAll('.comment-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); const username = el.getAttribute('data-username'); const content = el.getAttribute('data-content'); showCommentsModal(tid, username, content); }); });
             document.querySelectorAll('.like-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); await toggleLike(tid, currentUser.uid); }); });
             document.querySelectorAll('.retweet-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const originalId = el.getAttribute('data-original-id'); const originalUsername = el.getAttribute('data-original-username'); const originalContent = el.getAttribute('data-original-content'); const originalTweet = { content: originalContent, imageUrl: null }; await toggleRetweet(originalId, originalTweet, originalUsername); }); });
             for(let [tid] of tweetsArray) registerView(tid);
@@ -529,7 +610,6 @@
         modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
     }
 
-    // Initialize
     initDarkMode();
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
     verifyAndAuthorizeIP().then(() => { const webhookElem = document.getElementById('webhookBadge'); if (webhookElem) webhookElem.addEventListener('click', showWebhookModal); if (webhookUrl) setupWebhookListener(); });
