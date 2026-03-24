@@ -65,7 +65,6 @@
         
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
         
         .sidebar, .main-content, .right-sidebar { animation: slideIn 0.4s ease-out; }
         .tweet-card { animation: fadeInUp 0.3s ease-out; transition: transform 0.2s ease, box-shadow 0.2s ease; }
@@ -77,16 +76,11 @@
         .avatar, .profile-avatar { transition: transform 0.2s ease, border-color 0.2s ease; }
         .avatar:hover, .profile-avatar:hover { transform: scale(1.05); }
         .modal { animation: fadeInUp 0.2s ease-out; }
-        .toast { animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         
-        /* Disabled styling for restricted categories */
-        .category-select option:disabled { color: var(--disabled-color); background: var(--disabled-bg); text-decoration: line-through; }
-        .category-item.disabled { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; background: var(--disabled-bg); }
-        .category-item.disabled:hover { transform: none; background: var(--disabled-bg); }
         .post-btn-disabled { background: #9ca3af !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; text-decoration: line-through; }
-        .post-btn-disabled:hover { background: #9ca3af !important; transform: none !important; }
-        .permission-warning { font-size: 0.7rem; color: var(--disabled-color); margin-left: 8px; animation: shake 0.3s ease; }
+        .category-item.disabled { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; }
         
         .sidebar { width: 280px; background: var(--bg-primary); border-right: 1px solid var(--border-color); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
         .sidebar-logo { font-size: 24px; font-weight: 800; color: #1d9bf0; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
@@ -106,7 +100,8 @@
         .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--avatar-bg); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; overflow: hidden; cursor: pointer; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-name { font-weight: 700; font-size: 1.2rem; }
-        .profile-handle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; }
+        .profile-handle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; cursor: pointer; }
+        .profile-handle:hover { text-decoration: underline; color: #1d9bf0; }
         .profile-bio { font-size: 0.85rem; margin: 8px 0; word-break: break-word; }
         .role-badge { display: inline-block; background: #1d9bf0; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin: 4px 2px; }
         .edit-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 12px; font-size: 0.75rem; cursor: pointer; margin-top: 8px; color: var(--text-primary); transition: all 0.2s ease; }
@@ -124,7 +119,6 @@
         .category-select, .privacy-select { padding: 8px 12px; border-radius: 40px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
         .category-select:hover, .privacy-select:hover { border-color: #1d9bf0; }
         .tweet-btn { background: #1d9bf0; color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
-        .tweet-btn:hover { background: #0c8ad9; transform: scale(1.02); }
         .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; transition: all 0.2s ease; }
         .icon-btn:hover { transform: scale(1.1); }
         
@@ -150,14 +144,17 @@
         .engagement-bar { display: flex; gap: 20px; margin-top: 12px; margin-left: 56px; color: var(--text-secondary); }
         .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
         .eng-item:hover { color: #1d9bf0; transform: scale(1.05); }
-        .eng-item:active { transform: scale(0.95); }
         .eng-item.liked i { color: var(--like-color); }
         .eng-item.retweeted i { color: var(--retweet-color); }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; animation: fadeInUp 0.2s ease-out; }
         .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); animation: fadeInUp 0.3s ease-out; }
         .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
-        .modal-card input:focus, .modal-card textarea:focus { border-color: #1d9bf0; outline: none; transform: scale(1.01); }
+        .comments-list { max-height: 400px; overflow-y: auto; margin: 16px 0; }
+        .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; }
+        .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; flex-shrink: 0; }
+        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; transition: all 0.2s ease; }
+        .quoted-tweet:hover { background: var(--bg-hover); transform: translateX(2px); }
         .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
         .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; transition: all 0.2s ease; }
         .webhook-badge:hover { transform: scale(1.05); }
@@ -165,10 +162,8 @@
         .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
         .dark-mode-toggle:hover { transform: scale(1.05); }
         .image-preview-area { margin-top: 12px; position: relative; display: inline-block; animation: fadeInUp 0.2s ease-out; }
-        .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; }
+        .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; object-fit: cover; }
         .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
-        .remove-image-btn:hover { transform: scale(1.1); }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
         .follow-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; margin-left: 8px; transition: all 0.2s ease; }
         .follow-btn:hover { transform: scale(1.05); }
         .follow-btn.following { background: #1d9bf0; color: white; border-color: #1d9bf0; }
@@ -235,6 +230,7 @@
     let currentCategory = "all";
     let currentUserIP = "";
     let userRoles = { gm: false, un: false, unsc: false };
+    let webhookListenerActive = false;
     
     const CATEGORIES = [
         "International News", "GM Rulings", "GM Events", "UN Resolutions", 
@@ -249,7 +245,6 @@
         "African News": "🌍", "Arms Marketplace": "🔫"
     };
     
-    // Permission requirements for restricted categories
     const CATEGORY_PERMISSIONS = {
         "GM Rulings": "gm",
         "GM Events": "gm",
@@ -282,7 +277,7 @@
     
     function canPostInCategory(category) {
         const requiredPerm = CATEGORY_PERMISSIONS[category];
-        if (!requiredPerm) return true; // No permission needed for regular categories
+        if (!requiredPerm) return true;
         return userRoles[requiredPerm] === true;
     }
     
@@ -329,11 +324,6 @@
                 if(data.content) description += `\n\n**Comment:** "${data.content}"`;
                 color = 0x00BA7C; 
                 break;
-            case 'quote': 
-                title = `💬 Quote Tweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
-                description = `${formattedHandle} quoted ${extraInfo.originalAuthor}\n\n**Quote:** "${data.content}"\n\n**Original:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
-                color = 0x1D9BF0; 
-                break;
         }
         
         const embed = { 
@@ -344,6 +334,68 @@
         };
         if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
         try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
+    }
+    
+    // ========== REAL-TIME WEBHOOK LISTENER - CATCHES ALL POSTS FROM ANY USER ==========
+    function setupRealtimeWebhookListener() {
+        if (!webhookUrl) return;
+        if (webhookListenerActive) return;
+        webhookListenerActive = true;
+        console.log('🟢 WEBHOOK LISTENER ACTIVATED - Monitoring ALL public posts from ANY user');
+        
+        const postsRef = db.ref('posts');
+        postsRef.orderByChild('timestamp').limitToLast(1).on('child_added', async (snapshot) => {
+            const post = snapshot.val();
+            const postId = snapshot.key;
+            if (!webhookUrl) return;
+            if (post.privacy !== 'public') return;
+            
+            const processedKey = `webhook_sent_${postId}`;
+            if (localStorage.getItem(processedKey)) return;
+            localStorage.setItem(processedKey, Date.now().toString());
+            
+            const userSnap = await db.ref(`users/${post.uid}`).once('value');
+            const user = userSnap.val() || { username: 'unknown', displayName: 'Unknown', profilePicUrl: null };
+            
+            await sendToWebhook('tweet', 
+                { content: post.content, postId: postId, imageUrl: post.imageUrl }, 
+                user.username, user.profilePicUrl, 
+                { category: post.category }
+            );
+        });
+        
+        // Listen for replies
+        const commentsRef = db.ref('comments');
+        commentsRef.on('child_added', async (commentSnapshot) => {
+            if (!webhookUrl) return;
+            const tweetId = commentSnapshot.key;
+            const comments = commentSnapshot.val();
+            if (comments) {
+                const commentEntries = Object.entries(comments);
+                const lastComment = commentEntries[commentEntries.length - 1];
+                if (lastComment) {
+                    const [commentId, comment] = lastComment;
+                    const commentKey = `webhook_comment_${commentId}`;
+                    if (localStorage.getItem(commentKey)) return;
+                    localStorage.setItem(commentKey, Date.now().toString());
+                    
+                    const userSnap = await db.ref(`users/${comment.uid}`).once('value');
+                    const user = userSnap.val() || { username: 'unknown', profilePicUrl: null };
+                    const tweetSnap = await db.ref(`posts/${tweetId}`).once('value');
+                    const originalTweet = tweetSnap.val();
+                    const originalAuthorSnap = await db.ref(`users/${originalTweet?.uid}`).once('value');
+                    const originalAuthor = originalAuthorSnap.val()?.username || 'unknown';
+                    
+                    if (originalTweet?.privacy === 'public') {
+                        await sendToWebhook('reply', 
+                            { content: comment.text, postId: tweetId, imageUrl: null },
+                            user.username, user.profilePicUrl,
+                            { originalAuthor: `@${originalAuthor}`, originalContent: originalTweet?.content, category: originalTweet?.category }
+                        );
+                    }
+                }
+            }
+        });
     }
     
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
@@ -471,31 +523,73 @@
         modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Config</h3><p>Sends ALL public posts with category tags: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace, etc.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
-        document.getElementById('saveWebhookBtn').onclick = async () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); if (webhookUrl) await db.ref('config/webhookUrl').set(webhookUrl); else await db.ref('config/webhookUrl').remove(); showToast(webhookUrl ? '✅ Webhook saved' : 'Cleared'); modal.remove(); };
+        document.getElementById('saveWebhookBtn').onclick = async () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); if (webhookUrl) await db.ref('config/webhookUrl').set(webhookUrl); else await db.ref('config/webhookUrl').remove(); showToast(webhookUrl ? '✅ Webhook saved' : 'Cleared'); if (webhookUrl) setupRealtimeWebhookListener(); modal.remove(); };
         document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All public posts with categories will be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('Test sent!'); } catch(e) { showToast('Failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); db.ref('config/webhookUrl').remove(); showToast('Cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
+    // EDIT PROFILE - Can change display name AND username (@handle)
     async function showEditProfileModal() {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3>Edit Profile</h3><input type="text" id="editDisplayName" placeholder="Display Name" value="${currentUserProfile?.displayName || ''}"><textarea id="editBio" placeholder="Bio / Quote" rows="3">${currentUserProfile?.bio || ''}</textarea><input type="file" id="editAvatar" accept="image/*"><div class="button-group"><button id="saveProfileBtn" class="btn-primary btn">Save</button><button id="closeProfileModal" class="btn-outline btn">Cancel</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card">
+            <h3><i class="fas fa-user-edit"></i> Edit Profile</h3>
+            <label style="font-size:0.8rem; color:var(--text-secondary);">Display Name</label>
+            <input type="text" id="editDisplayName" placeholder="Display Name" value="${escapeHtml(currentUserProfile?.displayName || '')}">
+            <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Username (@handle)</label>
+            <input type="text" id="editUsername" placeholder="Username" value="${escapeHtml(currentUserProfile?.username || '')}" style="font-family: monospace;">
+            <label style="font-size:0.7rem; color:var(--text-secondary);">Letters, numbers, underscores only. Cannot be changed frequently.</label>
+            <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Bio</label>
+            <textarea id="editBio" placeholder="Bio / Quote" rows="3">${escapeHtml(currentUserProfile?.bio || '')}</textarea>
+            <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Profile Picture</label>
+            <input type="file" id="editAvatar" accept="image/*">
+            <div class="button-group">
+                <button id="saveProfileBtn" class="btn-primary btn">Save Changes</button>
+                <button id="closeProfileModal" class="btn-outline btn">Cancel</button>
+            </div>
+        </div>`;
         document.body.appendChild(modal);
+        
         document.getElementById('saveProfileBtn').onclick = async () => {
             const displayName = document.getElementById('editDisplayName').value.trim();
+            let newUsername = document.getElementById('editUsername').value.trim().toLowerCase();
             const bio = document.getElementById('editBio').value.trim();
             const avatarFile = document.getElementById('editAvatar').files[0];
+            
+            // Validate username
+            if (newUsername) {
+                newUsername = newUsername.replace(/[^a-z0-9_]/g, '');
+                if (newUsername.length < 2) newUsername = currentUserProfile?.username;
+                // Check if username is taken by another user
+                const existingUser = await db.ref('users').orderByChild('username').equalTo(newUsername).once('value');
+                let usernameTaken = false;
+                existingUser.forEach(snap => {
+                    if (snap.key !== currentUser.uid) usernameTaken = true;
+                });
+                if (usernameTaken) {
+                    showToast('❌ Username already taken! Choose another.');
+                    return;
+                }
+            }
+            
             let avatarUrl = currentUserProfile?.profilePicUrl;
             if (avatarFile) avatarUrl = await uploadImage(avatarFile);
-            await db.ref(`users/${currentUser.uid}`).update({ displayName: displayName || currentUser.email?.split('@')[0], bio: bio, profilePicUrl: avatarUrl });
-            currentUserProfile = { ...currentUserProfile, displayName, bio, profilePicUrl: avatarUrl };
+            
+            await db.ref(`users/${currentUser.uid}`).update({ 
+                displayName: displayName || currentUser.email?.split('@')[0],
+                username: newUsername || currentUserProfile?.username,
+                bio: bio,
+                profilePicUrl: avatarUrl
+            });
+            
+            currentUserProfile = { ...currentUserProfile, displayName, username: newUsername, bio, profilePicUrl: avatarUrl };
             updateProfileWidget();
             renderFeed();
             modal.remove();
-            showToast('Profile updated!');
+            showToast('✅ Profile updated!');
         };
         document.getElementById('closeProfileModal').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
@@ -524,7 +618,14 @@
         if (userRoles.gm) roleBadges += '<span class="role-badge">⚖️ GM</span>';
         if (userRoles.un) roleBadges += '<span class="role-badge">🇺🇳 UN</span>';
         if (userRoles.unsc) roleBadges += '<span class="role-badge">🛡️ UNSC</span>';
-        widget.innerHTML = `<div class="profile-card"><div class="profile-avatar" onclick="showEditProfileModal()">${avatarHtml}</div><div class="profile-name">${escapeHtml(currentUserProfile.displayName || currentUser.email?.split('@')[0])}</div><div class="profile-handle">${escapeHtml(formatUsername(currentUserProfile.username))}</div><div class="profile-bio">${escapeHtml(currentUserProfile.bio || 'No bio yet')}</div><div>${roleBadges}</div><button class="edit-profile-btn" onclick="showEditProfileModal()"><i class="fas fa-edit"></i> Edit Profile</button></div>`;
+        widget.innerHTML = `<div class="profile-card">
+            <div class="profile-avatar" onclick="showEditProfileModal()">${avatarHtml}</div>
+            <div class="profile-name">${escapeHtml(currentUserProfile.displayName || currentUser.email?.split('@')[0])}</div>
+            <div class="profile-handle" onclick="showEditProfileModal()">${escapeHtml(formatUsername(currentUserProfile.username))}</div>
+            <div class="profile-bio">${escapeHtml(currentUserProfile.bio || 'No bio yet')}</div>
+            <div>${roleBadges}</div>
+            <button class="edit-profile-btn" onclick="showEditProfileModal()"><i class="fas fa-edit"></i> Edit Profile</button>
+        </div>`;
     }
     
     function updateCategoriesWidget() {
@@ -632,9 +733,6 @@
             if (selectedFile) { imageUrl = await uploadImage(selectedFile); if (!imageUrl) { showToast('Image upload failed'); return; } }
             const postId = generateId();
             await db.ref(`posts/${postId}`).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, category: category, privacy: privacy, timestamp: Date.now() });
-            if (webhookUrl && privacy === 'public') {
-                await sendToWebhook('tweet', { content: content, postId: postId, imageUrl: imageUrl }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { category: category });
-            }
             document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; renderFeed(); showToast('Posted!');
         };
         
@@ -661,6 +759,7 @@
             const userSnap = await db.ref(`users/${post.uid}`).once('value');
             const profile = userSnap.val() || { username: 'user', displayName: 'User', profilePicUrl: null };
             const displayName = profile.displayName || profile.username;
+            const username = profile.username;
             const profilePic = profile.profilePicUrl;
             const timeAgo = new Date(post.timestamp).toLocaleString();
             const avatarHtml = profilePic ? `<img class="tweet-avatar-img" src="${profilePic}">` : `<span>${displayName.charAt(0).toUpperCase()}</span>`;
@@ -679,7 +778,7 @@
                     <div class="tweet-name-area">
                         <div class="tweet-name-row">
                             <span class="tweet-username">${escapeHtml(displayName)}</span>
-                            <span class="tweet-handle">${escapeHtml(formatUsername(profile.username))}</span>
+                            <span class="tweet-handle">${escapeHtml(formatUsername(username))}</span>
                             ${post.uid !== currentUser.uid ? `<button class="follow-btn ${isUserFollowing ? 'following' : ''}" data-uid="${post.uid}">${isUserFollowing ? 'Following' : 'Follow'}</button>` : ''}
                             <span class="tweet-time">${escapeHtml(timeAgo)}</span>
                         </div>
@@ -704,9 +803,9 @@
             }
             
             feedHtml += `<div class="engagement-bar">
-                <div class="eng-item comment-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '').substring(0, 150)}" data-category="${escapeHtml(post.category)}"><i class="far fa-comment"></i> ${commentCount}</div>
-                <div class="eng-item retweet-eng ${retweeted ? 'retweeted' : ''}" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-retweet"></i> ${retweetCount}</div>
-                <div class="eng-item quote-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-quote-right"></i> Quote</div>
+                <div class="eng-item comment-eng" data-postid="${post.id}" data-author="${escapeHtml(username)}" data-content="${escapeHtml(post.content || '').substring(0, 150)}" data-category="${escapeHtml(post.category)}"><i class="far fa-comment"></i> ${commentCount}</div>
+                <div class="eng-item retweet-eng ${retweeted ? 'retweeted' : ''}" data-postid="${post.id}" data-author="${escapeHtml(username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-retweet"></i> ${retweetCount}</div>
+                <div class="eng-item quote-eng" data-postid="${post.id}" data-author="${escapeHtml(username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-quote-right"></i> Quote</div>
                 <div class="eng-item like-eng ${liked ? 'liked' : ''}" data-postid="${post.id}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}"></i> ${likeCount}</div>
             </div></div>`;
         }
@@ -752,6 +851,7 @@
             updateProfileWidget(); 
             updateCategoriesWidget(); 
             renderFeed(); 
+            if (webhookUrl) setupRealtimeWebhookListener();
         } else { 
             currentUser = null; 
             currentUserProfile = null; 
