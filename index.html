@@ -245,20 +245,73 @@
     }
     
     async function sendToWebhook(type, data, username, userProfilePic, extraInfo = {}) {
-        if (!webhookUrl) return;
-        const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.postId}`;
-        const formattedHandle = `@${username}`;
-        let title = "", description = "", color = 0x1D9BF0;
-        switch(type) {
-            case 'tweet': title = `🕊️ New post from ${formattedHandle}`; description = data.content || "No text content"; break;
-            case 'reply': title = `💬 Reply from ${formattedHandle}`; description = `Replying to: ${extraInfo.originalAuthor}\n\n"${extraInfo.originalContent?.substring(0, 150)}"\n\nReply: ${data.content}`; color = 0x5865F2; break;
-            case 'retweet': title = `🔁 Retweet by ${formattedHandle}`; description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n"${extraInfo.originalContent?.substring(0, 150)}"`; if(data.content) description += `\n\nComment: "${data.content}"`; color = 0x00BA7C; break;
-            case 'quote': title = `💬 Quote Tweet by ${formattedHandle}`; description = `${formattedHandle} quoted ${extraInfo.originalAuthor}\n\nQuote: "${data.content}"\n\nOriginal: "${extraInfo.originalContent?.substring(0, 150)}"`; color = 0x1D9BF0; break;
-        }
-        const embed = { title, url: postUrl, color, timestamp: new Date().toISOString(), author: { name: formattedHandle, icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${username.charAt(0)}` }, footer: { text: "Made by Hyawii • Twitter", icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" }, fields: [{ name: "📝 Content", value: description.substring(0, 1024), inline: false }, { name: "🔗 View", value: `[Click to open](${postUrl})`, inline: false }] };
-        if (data.imageUrl) embed.image = { url: data.imageUrl };
-        try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
+    if (!webhookUrl) return;
+    const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.postId}`;
+    const formattedHandle = `@${username}`;
+    let title = "", description = "", color = 0x1D9BF0;
+    
+    // Get category icon and name
+    const categoryName = extraInfo.category || "General";
+    const categoryIcon = {
+        "International News": "🌍", "GM Rulings": "⚖️", "GM Events": "📅",
+        "UN Resolutions": "🇺🇳", "UNSC Resolutions": "🛡️", "American News": "🇺🇸",
+        "European News": "🇪🇺", "Asian News": "🇯🇵", "Middle Eastern News": "🕌",
+        "African News": "🌍", "Arms Marketplace": "🔫"
+    }[categoryName] || "📰";
+    
+    switch(type) {
+        case 'tweet': 
+            title = `🕊️ New post in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
+            description = data.content || "No text content"; 
+            break;
+        case 'reply': 
+            title = `💬 Reply in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
+            description = `**Replying to:** ${extraInfo.originalAuthor}\n\n**Original message:** "${extraInfo.originalContent?.substring(0, 150)}"\n\n**Reply:** ${data.content || ""}`; 
+            color = 0x5865F2; 
+            break;
+        case 'retweet': 
+            title = `🔁 Retweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
+            description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n**Original post:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
+            if(data.content) description += `\n\n**Comment:** "${data.content}"`;
+            color = 0x00BA7C; 
+            break;
+        case 'quote': 
+            title = `💬 Quote Tweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
+            description = `${formattedHandle} quoted ${extraInfo.originalAuthor}\n\n**Quote:** "${data.content}"\n\n**Original:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
+            color = 0x1D9BF0; 
+            break;
     }
+    
+    const embed = { 
+        title, 
+        url: postUrl, 
+        color, 
+        timestamp: new Date().toISOString(), 
+        author: { 
+            name: formattedHandle, 
+            icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${username.charAt(0)}`
+        }, 
+        footer: { 
+            text: `Made by Hyawii • Twitter • ${categoryName}`, 
+            icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
+        }, 
+        fields: [
+            { name: `📝 ${categoryIcon} ${categoryName} Post`, value: description.substring(0, 1024), inline: false }, 
+            { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }
+        ] 
+    };
+    
+    if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
+    
+    try { 
+        await fetch(webhookUrl, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ embeds: [embed] }) 
+        });
+        console.log(`✅ Webhook sent: ${type} in ${categoryName}`);
+    } catch(e) { console.warn('Webhook error:', e); }
+}
     
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
     
@@ -281,11 +334,14 @@
         else {
             await retweetRef.set({ timestamp: Date.now() });
             showToast('🔁 Retweeted!');
-            if (webhookUrl && originalPost.privacy === 'public') {
-                const userSnap = await db.ref(`users/${userId}`).once('value');
-                const user = userSnap.val() || { username: 'user', profilePicUrl: null };
-                await sendToWebhook('retweet', { content: "", postId: postId }, user.username, user.profilePicUrl, { originalAuthor: `@${originalPost.authorUsername}`, originalContent: originalPost.content });
-            }
+if (webhookUrl && originalPost.privacy === 'public') {
+    await sendToWebhook('retweet', 
+        { content: "", postId: postId }, 
+        user.username, 
+        user.profilePicUrl, 
+        { originalAuthor: `@${originalPost.authorUsername}`, originalContent: originalPost.content, category: originalPost.category }
+    );
+}
         }
         renderFeed();
     }
@@ -325,9 +381,14 @@
             if (webhookUrl) {
                 const postSnap = await db.ref(`posts/${postId}`).once('value');
                 const originalPost = postSnap.val();
-                if (originalPost?.privacy === 'public') {
-                    await sendToWebhook('reply', { content: text, postId: postId }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { originalAuthor: `@${authorUsername}`, originalContent: originalPost?.content });
-                }
+              if (webhookUrl) {
+    await sendToWebhook('reply', 
+        { content: text, postId: postId }, 
+        currentUserProfile?.username || 'user', 
+        currentUserProfile?.profilePicUrl, 
+        { originalAuthor: `@${authorUsername}`, originalContent: originalPost?.content, category: originalPost?.category || "General" }
+    );
+}
             }
             showToast('Reply posted!');
             document.getElementById('replyTextFull').value = '';
@@ -363,9 +424,14 @@
                 quotedContent: originalContent,
                 quotedImageUrl: originalImageUrl
             });
-            if (webhookUrl) {
-                await sendToWebhook('quote', { content: comment, postId: quoteId }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { originalAuthor: `@${originalAuthor}`, originalContent: originalContent });
-            }
+          if (webhookUrl) {
+    await sendToWebhook('quote', 
+        { content: comment, postId: quoteId }, 
+        currentUserProfile?.username || 'user', 
+        currentUserProfile?.profilePicUrl, 
+        { originalAuthor: `@${originalAuthor}`, originalContent: originalContent, category: "International News" }
+    );
+}
             showToast('Quote posted!');
             modal.remove();
             renderFeed();
@@ -405,7 +471,7 @@
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Config</h3><p>Sends ALL public posts (not Private/Following) to Discord</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
+     modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Config</h3><p>Sends ALL public posts with category tags: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace, etc.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
         document.getElementById('saveWebhookBtn').onclick = async () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); if (webhookUrl) await db.ref('config/webhookUrl').set(webhookUrl); else await db.ref('config/webhookUrl').remove(); showToast(webhookUrl ? '✅ Webhook saved' : 'Cleared'); modal.remove(); };
@@ -513,9 +579,14 @@
             const privacy = document.getElementById('postPrivacy').value;
             const postId = generateId();
             await db.ref(`posts/${postId}`).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, category: category, privacy: privacy, timestamp: Date.now() });
-            if (webhookUrl && privacy === 'public') {
-                await sendToWebhook('tweet', { content: content, postId: postId, imageUrl: imageUrl }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, {});
-            }
+         if (webhookUrl && privacy === 'public') {
+    await sendToWebhook('tweet', 
+        { content: content, postId: postId, imageUrl: imageUrl }, 
+        currentUserProfile?.username || 'user', 
+        currentUserProfile?.profilePicUrl, 
+        { category: category }
+    );
+}
             document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; renderFeed(); showToast('Posted!');
         };
         
