@@ -388,7 +388,28 @@
         modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Configuration</h3><p><strong>⚠️ IMPORTANT:</strong> For 24/7 webhook sending, you need to deploy the Firebase Cloud Function (see code comments).</p><p style="font-size:0.8rem; margin-top:8px;">The webhook URL below will be saved locally. The Cloud Function will use it to send ALL tweets from ALL users 24/7.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> This URL will be used by the Cloud Function to send all posts 24/7</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save URL</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
-        document.getElementById('saveWebhookBtn').onclick = () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); document.getElementById('webhookStatus').innerHTML = webhookUrl ? '✓ Webhook active' : ''; showToast(webhookUrl ? '✅ Webhook URL saved!' : 'Webhook cleared'); modal.remove(); };
+document.getElementById('saveWebhookBtn').onclick = async () => { 
+    webhookUrl = urlInput.value.trim(); 
+    localStorage.setItem('twitter_webhook', webhookUrl); 
+    document.getElementById('webhookStatus').innerHTML = webhookUrl ? '✓ Webhook active' : ''; 
+    
+    // 🔥 THIS IS WHERE YOU ADD THE CODE - SAVE TO FIREBASE FOR CLOUD FUNCTION
+    if (webhookUrl) {
+        try {
+            await db.ref('config/webhookUrl').set(webhookUrl);
+            console.log('Webhook URL saved to Firebase for Cloud Function');
+        } catch (error) {
+            console.error('Failed to save to Firebase:', error);
+        }
+    } else {
+        // Optionally clear it from Firebase if webhook is removed
+        await db.ref('config/webhookUrl').remove();
+    }
+    // END OF ADDED CODE
+    
+    showToast(webhookUrl ? '✅ Webhook URL saved!' : 'Webhook cleared'); 
+    modal.remove(); 
+};
         document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Test", description: "Your Twitter webhook is configured correctly! The Cloud Function will now send all posts 24/7.", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); document.getElementById('webhookStatus').innerHTML = ''; showToast('Webhook cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
