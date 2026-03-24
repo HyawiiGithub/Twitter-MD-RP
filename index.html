@@ -56,14 +56,45 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.2s ease; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.3s ease, color 0.3s ease; }
         .app-container { max-width: 1200px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; display: flex; }
+        
+        /* Smooth Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .sidebar, .main-content, .right-sidebar { animation: slideIn 0.4s ease-out; }
+        .tweet-card { animation: fadeInUp 0.3s ease-out; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .tweet-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .nav-item, .category-item, .eng-item, .btn, .icon-btn, .follow-btn { transition: all 0.2s ease; }
+        .nav-item:hover, .category-item:hover { transform: translateX(4px); }
+        .eng-item:active { transform: scale(0.95); }
+        .tweet-btn:active, .btn-primary:active { transform: scale(0.97); }
+        .avatar, .profile-avatar { transition: transform 0.2s ease, border-color 0.2s ease; }
+        .avatar:hover, .profile-avatar:hover { transform: scale(1.05); }
+        .modal { animation: fadeInUp 0.2s ease-out; }
+        .toast { animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
         
         .sidebar { width: 280px; background: var(--bg-primary); border-right: 1px solid var(--border-color); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
         .sidebar-logo { font-size: 24px; font-weight: 800; color: #1d9bf0; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
         .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 40px; cursor: pointer; transition: 0.2s; color: var(--text-secondary); }
-        .nav-item:hover { background: var(--webhook-badge-bg); color: #1d9bf0; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 40px; cursor: pointer; color: var(--text-secondary); }
+        .nav-item:hover { background: var(--webhook-badge-bg); color: #1d9bf0; transform: translateX(4px); }
         .nav-item.active { background: var(--webhook-badge-bg); color: #1d9bf0; font-weight: 600; }
         .nav-item i { width: 24px; font-size: 1.2rem; }
         
@@ -72,35 +103,42 @@
         .header h2 { font-size: 1.2rem; }
         
         .right-sidebar { width: 300px; padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-        .profile-card { background: var(--user-panel-bg); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; }
+        .profile-card { background: var(--user-panel-bg); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; transition: transform 0.2s ease; }
+        .profile-card:hover { transform: translateY(-2px); }
         .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--avatar-bg); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; overflow: hidden; cursor: pointer; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-name { font-weight: 700; font-size: 1.2rem; }
         .profile-handle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; }
         .profile-bio { font-size: 0.85rem; margin: 8px 0; word-break: break-word; }
-        .edit-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 12px; font-size: 0.75rem; cursor: pointer; margin-top: 8px; color: var(--text-primary); }
+        .edit-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 12px; font-size: 0.75rem; cursor: pointer; margin-top: 8px; color: var(--text-primary); transition: all 0.2s ease; }
+        .edit-profile-btn:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
         
         .categories-list { background: var(--user-panel-bg); border-radius: 20px; padding: 16px; }
-        .category-item { padding: 8px 12px; margin: 4px 0; border-radius: 40px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); }
-        .category-item:hover { background: var(--webhook-badge-bg); }
+        .category-item { padding: 8px 12px; margin: 4px 0; border-radius: 40px; cursor: pointer; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); transition: all 0.2s ease; }
+        .category-item:hover { background: var(--webhook-badge-bg); transform: translateX(4px); }
         .category-item.active { background: #1d9bf0; color: white; }
         
         .compose-area { padding: 16px 20px; border-bottom: 8px solid var(--border-color); }
-        .compose-input { width: 100%; border: none; outline: none; font-size: 1.1rem; resize: none; padding: 12px 0; min-height: 80px; background: var(--input-bg); color: var(--text-primary); }
-        .compose-input::placeholder { color: var(--text-secondary); }
+        .compose-input { width: 100%; border: none; outline: none; font-size: 1.1rem; resize: none; padding: 12px 0; min-height: 80px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
+        .compose-input:focus { padding-left: 8px; }
         .compose-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
-        .category-select, .privacy-select { padding: 8px 12px; border-radius: 40px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 0.8rem; }
-        .tweet-btn { background: #1d9bf0; color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; }
-        .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; }
+        .category-select, .privacy-select { padding: 8px 12px; border-radius: 40px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
+        .category-select:hover, .privacy-select:hover { border-color: #1d9bf0; }
+        .tweet-btn { background: #1d9bf0; color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        .tweet-btn:hover { background: #0c8ad9; transform: scale(1.02); }
+        .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; transition: all 0.2s ease; }
+        .icon-btn:hover { transform: scale(1.1); }
         
-        .tweet-card { border-bottom: 1px solid var(--border-color); padding: 16px 20px; transition: background 0.1s; background: var(--bg-card); }
+        .tweet-card { border-bottom: 1px solid var(--border-color); padding: 16px 20px; background: var(--bg-card); cursor: pointer; }
         .tweet-card:hover { background: var(--bg-hover); }
         .tweet-header { display: flex; gap: 12px; margin-bottom: 8px; }
-        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; cursor: pointer; }
+        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; cursor: pointer; transition: transform 0.2s ease; }
+        .tweet-avatar:hover { transform: scale(1.05); }
         .tweet-avatar-img { width: 100%; height: 100%; object-fit: cover; }
         .tweet-name-area { flex: 1; }
         .tweet-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .tweet-username { font-weight: 700; cursor: pointer; }
+        .tweet-username:hover { text-decoration: underline; }
         .tweet-handle { color: var(--text-secondary); font-size: 0.8rem; }
         .tweet-time { color: var(--text-secondary); font-size: 0.75rem; }
         .category-badge { background: var(--webhook-badge-bg); color: #1d9bf0; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
@@ -108,37 +146,49 @@
         .retweet-header, .quote-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 56px; color: var(--retweet-color); font-size: 0.75rem; }
         .tweet-content { margin: 8px 0 12px 56px; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
         .tweet-content a { color: #1d9bf0; text-decoration: none; }
-        .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; }
+        .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease; }
+        .tweet-media:hover { transform: scale(1.02); }
         .tweet-media img { max-width: 100%; max-height: 300px; border-radius: 20px; }
-        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; }
-        .quoted-tweet:hover { background: var(--bg-hover); }
+        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; transition: all 0.2s ease; }
+        .quoted-tweet:hover { background: var(--bg-hover); transform: translateX(2px); }
         .engagement-bar { display: flex; gap: 20px; margin-top: 12px; margin-left: 56px; color: var(--text-secondary); }
-        .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: 0.1s; }
-        .eng-item:hover { color: #1d9bf0; }
+        .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
+        .eng-item:hover { color: #1d9bf0; transform: scale(1.05); }
+        .eng-item:active { transform: scale(0.95); }
         .eng-item.liked i { color: var(--like-color); }
         .eng-item.retweeted i { color: var(--retweet-color); }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); }
-        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; animation: fadeInUp 0.2s ease-out; }
+        .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); animation: fadeInUp 0.3s ease-out; }
+        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
+        .modal-card input:focus, .modal-card textarea:focus { border-color: #1d9bf0; outline: none; transform: scale(1.01); }
         .comments-list { max-height: 400px; overflow-y: auto; margin: 16px 0; }
-        .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; }
+        .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; animation: fadeInUp 0.2s ease-out; }
         .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; flex-shrink: 0; }
-        .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; }
+        .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; transition: all 0.2s ease; }
+        .webhook-badge:hover { transform: scale(1.05); background: #d4eaf8; }
         .webhook-hidden { display: none !important; }
-        .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+        .dark-mode-toggle:hover { transform: scale(1.05); }
         .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
-        .image-preview-area { margin-top: 12px; position: relative; display: inline-block; }
+        .image-preview-area { margin-top: 12px; position: relative; display: inline-block; animation: fadeInUp 0.2s ease-out; }
         .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; }
-        .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: fadeOut 2s ease; }
-        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; } }
-        .follow-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; margin-left: 8px; }
+        .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+        .remove-image-btn:hover { transform: scale(1.1); background: #dc2626; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+        .follow-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; margin-left: 8px; transition: all 0.2s ease; }
+        .follow-btn:hover { transform: scale(1.05); }
         .follow-btn.following { background: #1d9bf0; color: white; border-color: #1d9bf0; }
-        .btn { border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; background: transparent; }
+        .btn { border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
         .btn-primary { background: #1d9bf0; color: white; }
-        .btn-outline { border: 1px solid var(--border-color); color: #1d9bf0; }
+        .btn-primary:hover { background: #0c8ad9; transform: scale(1.02); }
+        .btn-outline { border: 1px solid var(--border-color); color: #1d9bf0; background: transparent; }
+        .btn-outline:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
         .auth-buttons { display: flex; gap: 12px; }
+        
+        /* Loading shimmer effect */
+        .loading-shimmer { background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-hover) 50%, var(--bg-card) 100%); background-size: 1000px 100%; animation: shimmer 1.5s infinite; }
     </style>
 </head>
 <body>
@@ -244,86 +294,52 @@
         });
     }
     
+    // IMPROVED WEBHOOK WITH CATEGORY SUPPORT
     async function sendToWebhook(type, data, username, userProfilePic, extraInfo = {}) {
-    if (!webhookUrl) return;
-    const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.postId}`;
-    const formattedHandle = `@${username}`;
-    let title = "", description = "", color = 0x1D9BF0;
-    
-    // Get category icon and name
-    const categoryName = extraInfo.category || "General";
-    const categoryIcon = {
-        "International News": "🌍", "GM Rulings": "⚖️", "GM Events": "📅",
-        "UN Resolutions": "🇺🇳", "UNSC Resolutions": "🛡️", "American News": "🇺🇸",
-        "European News": "🇪🇺", "Asian News": "🇯🇵", "Middle Eastern News": "🕌",
-        "African News": "🌍", "Arms Marketplace": "🔫"
-    }[categoryName] || "📰";
-    
-    switch(type) {
-        case 'tweet': 
-            title = `🕊️ New post in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
-            description = data.content || "No text content"; 
-            break;
-        case 'reply': 
-            title = `💬 Reply in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
-            description = `**Replying to:** ${extraInfo.originalAuthor}\n\n**Original message:** "${extraInfo.originalContent?.substring(0, 150)}"\n\n**Reply:** ${data.content || ""}`; 
-            color = 0x5865F2; 
-            break;
-        case 'retweet': 
-            title = `🔁 Retweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
-            description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n**Original post:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
-            if(data.content) description += `\n\n**Comment:** "${data.content}"`;
-            color = 0x00BA7C; 
-            break;
-        case 'quote': 
-            title = `💬 Quote Tweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
-            description = `${formattedHandle} quoted ${extraInfo.originalAuthor}\n\n**Quote:** "${data.content}"\n\n**Original:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
-            color = 0x1D9BF0; 
-            break;
+        if (!webhookUrl) return;
+        const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.postId}`;
+        const formattedHandle = `@${username}`;
+        let title = "", description = "", color = 0x1D9BF0;
+        
+        const categoryName = extraInfo.category || "General";
+        const categoryIcon = CATEGORY_ICONS[categoryName] || "📰";
+        
+        switch(type) {
+            case 'tweet': 
+                title = `🕊️ New post in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
+                description = data.content || "No text content"; 
+                break;
+            case 'reply': 
+                title = `💬 Reply in ${categoryIcon} **${categoryName}** from ${formattedHandle}`; 
+                description = `**Replying to:** ${extraInfo.originalAuthor}\n\n**Original message:** "${extraInfo.originalContent?.substring(0, 150)}"\n\n**Reply:** ${data.content || ""}`; 
+                color = 0x5865F2; 
+                break;
+            case 'retweet': 
+                title = `🔁 Retweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
+                description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n**Original post:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
+                if(data.content) description += `\n\n**Comment:** "${data.content}"`;
+                color = 0x00BA7C; 
+                break;
+            case 'quote': 
+                title = `💬 Quote Tweet in ${categoryIcon} **${categoryName}** by ${formattedHandle}`; 
+                description = `${formattedHandle} quoted ${extraInfo.originalAuthor}\n\n**Quote:** "${data.content}"\n\n**Original:** "${extraInfo.originalContent?.substring(0, 150)}"`; 
+                color = 0x1D9BF0; 
+                break;
+        }
+        
+        const embed = { 
+            title, url: postUrl, color, timestamp: new Date().toISOString(), 
+            author: { name: formattedHandle, icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${username.charAt(0)}` }, 
+            footer: { text: `Made by Hyawii • Twitter • ${categoryName}`, icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png" }, 
+            fields: [{ name: `📝 ${categoryIcon} ${categoryName} Post`, value: description.substring(0, 1024), inline: false }, { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }] 
+        };
+        if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
+        try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
     }
-    
-    const embed = { 
-        title, 
-        url: postUrl, 
-        color, 
-        timestamp: new Date().toISOString(), 
-        author: { 
-            name: formattedHandle, 
-            icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${username.charAt(0)}`
-        }, 
-        footer: { 
-            text: `Made by Hyawii • Twitter • ${categoryName}`, 
-            icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
-        }, 
-        fields: [
-            { name: `📝 ${categoryIcon} ${categoryName} Post`, value: description.substring(0, 1024), inline: false }, 
-            { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }
-        ] 
-    };
-    
-    if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
-    
-    try { 
-        await fetch(webhookUrl, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ embeds: [embed] }) 
-        });
-        console.log(`✅ Webhook sent: ${type} in ${categoryName}`);
-    } catch(e) { console.warn('Webhook error:', e); }
-}
     
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
     
-    // Interactions
-    async function toggleLike(postId, userId) {
-        const likeRef = db.ref(`likes/${postId}/${userId}`);
-        const snap = await likeRef.once('value');
-        if (snap.exists()) { await likeRef.remove(); }
-        else { await likeRef.set(true); }
-        renderFeed();
-    }
-    
+    async function toggleLike(postId, userId) { const likeRef = db.ref(`likes/${postId}/${userId}`); const snap = await likeRef.once('value'); if (snap.exists()) { await likeRef.remove(); } else { await likeRef.set(true); } renderFeed(); }
     async function getLikeCount(postId) { const snap = await db.ref(`likes/${postId}`).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     async function hasLiked(postId, userId) { const snap = await db.ref(`likes/${postId}/${userId}`).once('value'); return snap.exists(); }
     
@@ -334,24 +350,19 @@
         else {
             await retweetRef.set({ timestamp: Date.now() });
             showToast('🔁 Retweeted!');
-if (webhookUrl && originalPost.privacy === 'public') {
-    await sendToWebhook('retweet', 
-        { content: "", postId: postId }, 
-        user.username, 
-        user.profilePicUrl, 
-        { originalAuthor: `@${originalPost.authorUsername}`, originalContent: originalPost.content, category: originalPost.category }
-    );
-}
+            if (webhookUrl && originalPost.privacy === 'public') {
+                const userSnap = await db.ref(`users/${userId}`).once('value');
+                const user = userSnap.val() || { username: 'user', profilePicUrl: null };
+                await sendToWebhook('retweet', { content: "", postId: postId }, user.username, user.profilePicUrl, { originalAuthor: `@${originalPost.authorUsername}`, originalContent: originalPost.content, category: originalPost.category });
+            }
         }
         renderFeed();
     }
-    
     async function getRetweetCount(postId) { const snap = await db.ref(`retweets/${postId}`).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     async function hasRetweeted(postId, userId) { const snap = await db.ref(`retweets/${postId}/${userId}`).once('value'); return snap.exists(); }
-    
     async function getCommentCount(postId) { const snap = await db.ref(`comments/${postId}`).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     
-    async function showCommentsModal(postId, authorUsername, content) {
+    async function showCommentsModal(postId, authorUsername, content, category) {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
@@ -381,14 +392,9 @@ if (webhookUrl && originalPost.privacy === 'public') {
             if (webhookUrl) {
                 const postSnap = await db.ref(`posts/${postId}`).once('value');
                 const originalPost = postSnap.val();
-              if (webhookUrl) {
-    await sendToWebhook('reply', 
-        { content: text, postId: postId }, 
-        currentUserProfile?.username || 'user', 
-        currentUserProfile?.profilePicUrl, 
-        { originalAuthor: `@${authorUsername}`, originalContent: originalPost?.content, category: originalPost?.category || "General" }
-    );
-}
+                if (originalPost?.privacy === 'public') {
+                    await sendToWebhook('reply', { content: text, postId: postId }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { originalAuthor: `@${authorUsername}`, originalContent: originalPost?.content, category: originalPost?.category || category });
+                }
             }
             showToast('Reply posted!');
             document.getElementById('replyTextFull').value = '';
@@ -400,8 +406,7 @@ if (webhookUrl && originalPost.privacy === 'public') {
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
-    // Quote Tweet Modal
-    async function showQuoteModal(originalPostId, originalAuthor, originalContent, originalImageUrl) {
+    async function showQuoteModal(originalPostId, originalAuthor, originalContent, originalImageUrl, originalCategory) {
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
@@ -412,26 +417,12 @@ if (webhookUrl && originalPost.privacy === 'public') {
             const comment = document.getElementById('quoteText').value.trim();
             const quoteId = generateId();
             await db.ref(`posts/${quoteId}`).set({
-                uid: currentUser.uid,
-                content: comment,
-                imageUrl: null,
-                category: "International News",
-                privacy: "public",
-                timestamp: Date.now(),
-                isQuote: true,
-                quotedPostId: originalPostId,
-                quotedAuthor: originalAuthor,
-                quotedContent: originalContent,
-                quotedImageUrl: originalImageUrl
+                uid: currentUser.uid, content: comment, imageUrl: null, category: "International News", privacy: "public", timestamp: Date.now(),
+                isQuote: true, quotedPostId: originalPostId, quotedAuthor: originalAuthor, quotedContent: originalContent, quotedImageUrl: originalImageUrl
             });
-          if (webhookUrl) {
-    await sendToWebhook('quote', 
-        { content: comment, postId: quoteId }, 
-        currentUserProfile?.username || 'user', 
-        currentUserProfile?.profilePicUrl, 
-        { originalAuthor: `@${originalAuthor}`, originalContent: originalContent, category: "International News" }
-    );
-}
+            if (webhookUrl) {
+                await sendToWebhook('quote', { content: comment, postId: quoteId }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { originalAuthor: `@${originalAuthor}`, originalContent: originalContent, category: "International News" });
+            }
             showToast('Quote posted!');
             modal.remove();
             renderFeed();
@@ -440,7 +431,6 @@ if (webhookUrl && originalPost.privacy === 'public') {
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
-    // Admin Panel
     async function showAdminPanel() {
         if (currentUserIP !== AUTHORIZED_IP) { showToast('Admin access restricted'); return; }
         const usersSnap = await db.ref('users').once('value');
@@ -456,7 +446,6 @@ if (webhookUrl && originalPost.privacy === 'public') {
         html += '</div><div class="button-group"><button id="closeAdminModal" class="btn-outline btn">Close</button></div></div>';
         modal.innerHTML = html;
         document.body.appendChild(modal);
-        
         const saveRole = async (uid, role, checked) => { if (checked) await db.ref(`users/${uid}/roles/${role}`).set(true); else await db.ref(`users/${uid}/roles/${role}`).remove(); };
         document.querySelectorAll('.gm-checkbox').forEach(cb => cb.addEventListener('change', (e) => saveRole(cb.dataset.uid, 'gm', cb.checked)));
         document.querySelectorAll('.un-checkbox').forEach(cb => cb.addEventListener('change', (e) => saveRole(cb.dataset.uid, 'un', cb.checked)));
@@ -465,23 +454,21 @@ if (webhookUrl && originalPost.privacy === 'public') {
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
-    // Webhook Config Modal
     function showWebhookModal() {
         if (currentUserIP !== AUTHORIZED_IP) { showToast('🔒 Webhook settings restricted'); return; }
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-     modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Config</h3><p>Sends ALL public posts with category tags: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace, etc.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Config</h3><p>Sends ALL public posts with category tags: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace, etc.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
         document.getElementById('saveWebhookBtn').onclick = async () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); if (webhookUrl) await db.ref('config/webhookUrl').set(webhookUrl); else await db.ref('config/webhookUrl').remove(); showToast(webhookUrl ? '✅ Webhook saved' : 'Cleared'); modal.remove(); };
-        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All public posts will be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('Test sent!'); } catch(e) { showToast('Failed'); } };
+        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All public posts with categories will be sent here! Categories: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace", color: 0x1D9BF0, footer: { text: "Made by Hyawii • Twitter" } }] }) }); showToast('Test sent!'); } catch(e) { showToast('Failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); db.ref('config/webhookUrl').remove(); showToast('Cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
-    // Profile Functions
     async function showEditProfileModal() {
         const modal = document.createElement('div');
         modal.className = 'modal';
@@ -579,35 +566,26 @@ if (webhookUrl && originalPost.privacy === 'public') {
             const privacy = document.getElementById('postPrivacy').value;
             const postId = generateId();
             await db.ref(`posts/${postId}`).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, category: category, privacy: privacy, timestamp: Date.now() });
-         if (webhookUrl && privacy === 'public') {
-    await sendToWebhook('tweet', 
-        { content: content, postId: postId, imageUrl: imageUrl }, 
-        currentUserProfile?.username || 'user', 
-        currentUserProfile?.profilePicUrl, 
-        { category: category }
-    );
-}
+            if (webhookUrl && privacy === 'public') {
+                await sendToWebhook('tweet', { content: content, postId: postId, imageUrl: imageUrl }, currentUserProfile?.username || 'user', currentUserProfile?.profilePicUrl, { category: category });
+            }
             document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; renderFeed(); showToast('Posted!');
         };
         
         const postsSnap = await db.ref('posts').once('value');
         const posts = postsSnap.val() || {};
         let postsArray = Object.entries(posts).map(([id, post]) => ({ id, ...post }));
-        
         if (currentCategory !== 'all') { postsArray = postsArray.filter(p => p.category === currentCategory); }
         if (currentView === 'marketplace') { postsArray = postsArray.filter(p => p.category === 'Arms Marketplace'); }
-        
         const following = new Set();
         const followersSnap = await db.ref(`followers/${currentUser.uid}`).once('value');
         Object.keys(followersSnap.val() || {}).forEach(uid => following.add(uid));
-        
         postsArray = postsArray.filter(post => {
             if (post.privacy === 'public') return true;
             if (post.privacy === 'private' && post.uid === currentUser.uid) return true;
             if (post.privacy === 'followers' && (post.uid === currentUser.uid || following.has(post.uid))) return true;
             return false;
         });
-        
         postsArray.sort((a,b) => b.timestamp - a.timestamp);
         const feedDiv = document.getElementById('feedList');
         if (postsArray.length === 0) { feedDiv.innerHTML = '<div style="padding:40px;text-align:center">No posts in this category.</div>'; return; }
@@ -627,6 +605,7 @@ if (webhookUrl && originalPost.privacy === 'public') {
             const retweeted = await hasRetweeted(post.id, currentUser.uid);
             const commentCount = await getCommentCount(post.id);
             const isUserFollowing = await isFollowing(post.uid);
+            const categoryIcon = CATEGORY_ICONS[post.category] || "📰";
             
             feedHtml += `<div class="tweet-card" data-post-id="${post.id}">
                 <div class="tweet-header">
@@ -639,7 +618,7 @@ if (webhookUrl && originalPost.privacy === 'public') {
                             <span class="tweet-time">${escapeHtml(timeAgo)}</span>
                         </div>
                         <div style="display:flex; gap:6px; margin-top:4px;">
-                            <span class="category-badge"><i class="fas fa-tag"></i> ${escapeHtml(post.category)}</span>
+                            <span class="category-badge"><i class="fas fa-tag"></i> ${categoryIcon} ${escapeHtml(post.category)}</span>
                             <span class="privacy-badge"><i class="fas ${post.privacy === 'public' ? 'fa-globe' : (post.privacy === 'private' ? 'fa-lock' : 'fa-users')}"></i> ${post.privacy}</span>
                         </div>
                     </div>
@@ -648,7 +627,7 @@ if (webhookUrl && originalPost.privacy === 'public') {
             if (post.isQuote) {
                 feedHtml += `<div class="quote-header"><i class="fas fa-quote-right"></i> Quoted @${escapeHtml(post.quotedAuthor)}</div>`;
                 feedHtml += `<div class="tweet-content">${processedContent || '<span style="color:var(--text-secondary)">(No additional comment)</span>'}</div>`;
-                feedHtml += `<div class="quoted-tweet" onclick="showCommentsModal('${post.quotedPostId}', '${escapeHtml(post.quotedAuthor)}', '${escapeHtml(post.quotedContent)}')">
+                feedHtml += `<div class="quoted-tweet" onclick="showCommentsModal('${post.quotedPostId}', '${escapeHtml(post.quotedAuthor)}', '${escapeHtml(post.quotedContent)}', '${escapeHtml(post.category)}')">
                     <div style="font-weight:600;">@${escapeHtml(post.quotedAuthor)}</div>
                     <div>${escapeHtml(post.quotedContent?.substring(0, 120))}</div>
                     ${post.quotedImageUrl ? `<img src="${post.quotedImageUrl}" style="max-width:100%; max-height:150px; border-radius:12px; margin-top:8px;">` : ''}
@@ -659,26 +638,24 @@ if (webhookUrl && originalPost.privacy === 'public') {
             }
             
             feedHtml += `<div class="engagement-bar">
-                <div class="eng-item comment-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '').substring(0, 150)}"><i class="far fa-comment"></i> ${commentCount}</div>
-                <div class="eng-item retweet-eng ${retweeted ? 'retweeted' : ''}" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}"><i class="fas fa-retweet"></i> ${retweetCount}</div>
-                <div class="eng-item quote-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}"><i class="fas fa-quote-right"></i> Quote</div>
+                <div class="eng-item comment-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '').substring(0, 150)}" data-category="${escapeHtml(post.category)}"><i class="far fa-comment"></i> ${commentCount}</div>
+                <div class="eng-item retweet-eng ${retweeted ? 'retweeted' : ''}" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-retweet"></i> ${retweetCount}</div>
+                <div class="eng-item quote-eng" data-postid="${post.id}" data-author="${escapeHtml(profile.username)}" data-content="${escapeHtml(post.content || '')}" data-image="${post.imageUrl || ''}" data-category="${escapeHtml(post.category)}"><i class="fas fa-quote-right"></i> Quote</div>
                 <div class="eng-item like-eng ${liked ? 'liked' : ''}" data-postid="${post.id}"><i class="${liked ? 'fas fa-heart' : 'far fa-heart'}"></i> ${likeCount}</div>
             </div></div>`;
         }
         feedDiv.innerHTML = feedHtml;
         
         document.querySelectorAll('.follow-btn').forEach(btn => { btn.addEventListener('click', async (e) => { e.stopPropagation(); await toggleFollow(btn.dataset.uid); renderFeed(); }); });
-        document.querySelectorAll('.comment-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; showCommentsModal(pid, author, content); }); });
+        document.querySelectorAll('.comment-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; const category = el.dataset.category; showCommentsModal(pid, author, content, category); }); });
         document.querySelectorAll('.like-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); await toggleLike(el.dataset.postid, currentUser.uid); }); });
-        document.querySelectorAll('.retweet-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; const image = el.dataset.image; const post = { authorUsername: author, content: content, imageUrl: image, privacy: 'public' }; await toggleRetweet(pid, currentUser.uid, post); }); });
-        document.querySelectorAll('.quote-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; const image = el.dataset.image; showQuoteModal(pid, author, content, image); }); });
+        document.querySelectorAll('.retweet-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; const image = el.dataset.image; const category = el.dataset.category; const post = { authorUsername: author, content: content, imageUrl: image, privacy: 'public', category: category }; await toggleRetweet(pid, currentUser.uid, post); }); });
+        document.querySelectorAll('.quote-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const pid = el.dataset.postid; const author = el.dataset.author; const content = el.dataset.content; const image = el.dataset.image; const category = el.dataset.category; showQuoteModal(pid, author, content, image, category); }); });
     }
     
-    // Dark Mode
     function initDarkMode() { const saved = localStorage.getItem('twitter_dark_mode'); if (saved === 'dark') { document.body.classList.add('dark-mode'); document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i> Light'; } else { document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-moon"></i> Dark'; } }
     function toggleDarkMode() { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); localStorage.setItem('twitter_dark_mode', isDark ? 'dark' : 'light'); document.getElementById('darkModeToggle').innerHTML = isDark ? '<i class="fas fa-sun"></i> Light' : '<i class="fas fa-moon"></i> Dark'; }
     
-    // Auth
     function updateAuthUI() {
         const authDiv = document.getElementById('authWidget');
         if (!currentUser) {
@@ -717,7 +694,6 @@ if (webhookUrl && originalPost.privacy === 'public') {
         modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
     }
     
-    // Navigation
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', () => {
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
