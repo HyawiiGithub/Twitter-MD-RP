@@ -62,7 +62,7 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.2s ease, color 0.2s ease; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.2s ease; }
         .app-container { max-width: 700px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
         .header { background: var(--bg-primary); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -137,8 +137,9 @@
         @keyframes fadeInOut { 0% { opacity: 0; transform: translateX(-50%) translateY(20px); } 15% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(20px); } }
         .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
         .image-preview-area { margin-top: 12px; position: relative; display: inline-block; }
-        .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; }
+        .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; object-fit: cover; }
         .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+        .webhook-status { font-size: 0.65rem; color: var(--text-secondary); margin-left: 8px; }
     </style>
 </head>
 <body>
@@ -147,7 +148,8 @@
         <div class="logo-area">
             <i class="fab fa-twitter logo-icon"></i>
             <span class="logo-text">Twitter</span>
-            <div id="webhookBadge" class="webhook-badge webhook-hidden"><i class="fas fa-webhook"></i> Webhook</div>
+            <div id="webhookBadge" class="webhook-badge webhook-hidden"><i class="fas fa-webhook"></i> Webhook Config</div>
+            <span id="webhookStatus" class="webhook-status"></span>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
             <button id="darkModeToggle" class="dark-mode-toggle"><i class="fas fa-moon"></i> Dark</button>
@@ -209,7 +211,7 @@
     let retweetsRef = db.ref('retweets');
     let isAuthorizedIP = false;
     let currentCropper = null;
-    let webhookListenerActive = false;
+    let realtimeListenerActive = false;
 
     function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
     function formatUsername(username) { return username ? '@' + username : '@user'; }
@@ -227,110 +229,21 @@
         } catch (error) { isAuthorizedIP = false; }
     }
 
-    async function sendToWebhook(type, data, username, userProfilePic, extraInfo = {}) {
-        if (!webhookUrl) return;
-        const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.tweetId}`;
-        const timestamp = new Date().toISOString();
-        const formattedHandle = `@${username}`;
-        let title = "", description = "", color = 0x1D9BF0;
-        
-        switch(type) {
-            case 'tweet': 
-                title = `🕊️ New post from ${formattedHandle}`; 
-                description = data.content || "No text content"; 
-                break;
-            case 'reply': 
-                title = `💬 Reply from ${formattedHandle}`; 
-                description = `**Replying to:** ${extraInfo.originalAuthor}\n\n**Original message:** "${extraInfo.originalContent?.substring(0, 200) || ""}"\n\n**Reply:** ${data.content || ""}`; 
-                color = 0x5865F2; 
-                break;
-            case 'retweet': 
-                title = `🔁 Retweet by ${formattedHandle}`; 
-                description = `${formattedHandle} retweeted ${extraInfo.originalAuthor}\n\n**Original post:** "${extraInfo.originalContent?.substring(0, 150) || ""}"`; 
-                if(data.content) description += `\n\n**With comment:** "${data.content.substring(0, 100)}"`;
-                color = 0x00BA7C; 
-                break;
-        }
-        
-        const embed = { 
-            title, 
-            url: postUrl, 
-            color, 
-            timestamp, 
-            author: { 
-                name: formattedHandle, 
-                icon_url: userProfilePic || `https://ui-avatars.com/api/?background=1D9BF0&color=fff&bold=true&name=${encodeURIComponent(username.charAt(0))}`
-            }, 
-            footer: { 
-                text: `Made by Hyawii • Twitter`, 
-                icon_url: "https://cdn-icons-png.flaticon.com/512/733/733579.png"
-            }, 
-            fields: [
-                { name: "📝 Content", value: description.substring(0, 1024), inline: false }, 
-                { name: "🔗 View Post", value: `[Click to open](${postUrl})`, inline: false }
-            ] 
-        };
-        
-        if (data.imageUrl) { embed.image = { url: data.imageUrl }; }
-        
-        try { 
-            await fetch(webhookUrl, { 
-                method: 'POST', 
-                headers: { 'Content-Type': 'application/json' }, 
-                body: JSON.stringify({ embeds: [embed] }) 
-            });
-        } catch(e) {}
-    }
-
-    function setupWebhookListener() {
-        if (webhookListenerActive) return;
-        webhookListenerActive = true;
-        
-        tweetsRef.orderByChild('timestamp').limitToLast(1).on('child_added', async (snapshot) => {
-            if (!webhookUrl) return;
-            const tweet = snapshot.val();
-            const tweetId = snapshot.key;
-            const userSnap = await usersRef.child(tweet.uid).once('value');
-            const userProfile = userSnap.val() || { username: 'unknown', profilePicUrl: null };
-            if (tweet.isRetweet) {
-                await sendToWebhook('retweet', { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl }, userProfile.username, userProfile.profilePicUrl, { originalAuthor: `@${tweet.originalAuthor}`, originalContent: tweet.originalContent || '' });
-            } else {
-                await sendToWebhook('tweet', { content: tweet.content || "", tweetId: tweetId, imageUrl: tweet.imageUrl }, userProfile.username, userProfile.profilePicUrl, {});
-            }
-        });
-        
-        commentsRef.on('child_added', async (commentSnapshot) => {
-            if (!webhookUrl) return;
-            const tweetId = commentSnapshot.key;
-            const comments = commentSnapshot.val();
-            if (comments) {
-                const commentEntries = Object.entries(comments);
-                const lastComment = commentEntries[commentEntries.length - 1];
-                if (lastComment) {
-                    const [commentId, comment] = lastComment;
-                    const userSnap = await usersRef.child(comment.uid).once('value');
-                    const userProfile = userSnap.val() || { username: 'unknown', profilePicUrl: null };
-                    const tweetSnap = await tweetsRef.child(tweetId).once('value');
-                    const originalTweet = tweetSnap.val();
-                    const originalAuthorSnap = await usersRef.child(originalTweet?.uid).once('value');
-                    const originalAuthor = originalAuthorSnap.val()?.username || 'unknown';
-                    const originalContent = originalTweet?.content || '';
-                    await sendToWebhook('reply',
-                        { content: comment.text, tweetId: tweetId, imageUrl: null },
-                        userProfile.username, userProfile.profilePicUrl,
-                        { originalAuthor: `@${originalAuthor}`, originalContent: originalContent }
-                    );
-                }
-            }
-        });
-    }
-
     function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
 
     async function uploadImage(file) { 
-        const storageRef = storage.ref(`tweet_images/${generateId()}_${file.name}`); 
-        await storageRef.put(file); 
-        return await storageRef.getDownloadURL(); 
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${generateId()}.${fileExt}`;
+            const storageRef = storage.ref(`tweet_images/${fileName}`); 
+            const uploadTask = await storageRef.put(file);
+            const downloadUrl = await storageRef.getDownloadURL();
+            return downloadUrl;
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('❌ Image upload failed!');
+            return null;
+        }
     }
 
     async function showAvatarUploadModal() {
@@ -372,7 +285,6 @@
         await tweetsRef.child(retweetId).set({ uid: currentUser.uid, content: comment, imageUrl: null, timestamp: Date.now(), isRetweet: true, originalTweetId: originalTweetId, originalAuthor: originalUsername, originalContent: originalTweetData.content || "", originalImageUrl: originalTweetData.imageUrl || null });
         await retweetsRef.child(originalTweetId).child('count').transaction(c => (c || 0) + 1);
         showToast('🔁 Retweeted!');
-        renderFeed();
     }
 
     async function toggleRetweet(originalTweetId, originalTweetData, originalUsername) {
@@ -391,10 +303,9 @@
     function registerView(tweetId) { if (!currentUser) return; viewsRef.child(tweetId).child(currentUser.uid).once('value', snap => { if (!snap.exists()) { snap.ref.set(true); viewsRef.child(tweetId).child('count').transaction(c => (c || 0) + 1); } }); }
     async function getViewCount(tweetId) { const snap = await viewsRef.child(tweetId).child('count').once('value'); return snap.val() || 0; }
     async function getLikeInfo(tweetId, userId) { const likeSnap = await likesRef.child(tweetId).child(userId).once('value'); const liked = likeSnap.exists(); const countSnap = await likesRef.child(tweetId).child('count').once('value'); return { liked, count: countSnap.val() || 0 }; }
-    async function toggleLike(tweetId, userId) { const likeNode = likesRef.child(tweetId).child(userId); const countNode = likesRef.child(tweetId).child('count'); const snap = await likeNode.once('value'); if (snap.exists()) { await likeNode.remove(); await countNode.transaction(c => (c || 1) - 1); } else { await likeNode.set(true); await countNode.transaction(c => (c || 0) + 1); } renderFeed(); }
+    async function toggleLike(tweetId, userId) { const likeNode = likesRef.child(tweetId).child(userId); const countNode = likesRef.child(tweetId).child('count'); const snap = await likeNode.once('value'); if (snap.exists()) { await likeNode.remove(); await countNode.transaction(c => (c || 1) - 1); } else { await likeNode.set(true); await countNode.transaction(c => (c || 0) + 1); } }
     async function getCommentCount(tweetId) { const snap = await commentsRef.child(tweetId).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     
-    // Show full comments modal with all replies
     async function showCommentsModal(tweetId, originalUsername, originalContent) {
         const modal = document.createElement('div');
         modal.className = 'modal';
@@ -463,7 +374,6 @@
             showToast('💬 Reply posted!');
             document.getElementById('replyTextFull').value = '';
             await loadComments();
-            renderFeed();
         };
         
         document.getElementById('closeCommentsModal').onclick = () => modal.remove();
@@ -471,18 +381,111 @@
     }
 
     function showWebhookModal() {
-        if (!isAuthorizedIP) { showToast('🔒 Webhook settings are restricted'); return; }
+        if (!isAuthorizedIP) { showToast('🔒 Webhook settings are restricted to your IP only'); return; }
         const modal = document.createElement('div');
         modal.className = 'modal';
         modal.style.display = 'flex';
-        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook</h3><p>All tweets from EVERY user are sent here automatically.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> Monitors: New Posts, Replies (with original message), Retweets</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save & Activate</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
+        modal.innerHTML = `<div class="modal-card"><h3><i class="fas fa-webhook"></i> Webhook Configuration</h3><p><strong>⚠️ IMPORTANT:</strong> For 24/7 webhook sending, you need to deploy the Firebase Cloud Function (see code comments).</p><p style="font-size:0.8rem; margin-top:8px;">The webhook URL below will be saved locally. The Cloud Function will use it to send ALL tweets from ALL users 24/7.</p><input type="url" id="webhookUrlInput" placeholder="Discord webhook URL..." value="${escapeHtml(webhookUrl)}"><div class="webhook-preview"><i class="fas fa-globe"></i> This URL will be used by the Cloud Function to send all posts 24/7</div><div class="button-group"><button id="saveWebhookBtn" class="btn-primary btn">Save URL</button><button id="testWebhookBtn" class="btn-outline btn">Test</button><button id="clearWebhookBtn" class="btn-outline btn">Clear</button><button id="closeWebhookBtn" class="btn-outline btn">Close</button></div></div>`;
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
-        document.getElementById('saveWebhookBtn').onclick = () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); showToast(webhookUrl ? '✅ Webhook saved & active!' : 'Webhook cleared'); if (webhookUrl) setupWebhookListener(); modal.remove(); };
-        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All tweets, replies (with original message), and retweets will be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
-        document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); showToast('Webhook cleared'); modal.remove(); };
+        document.getElementById('saveWebhookBtn').onclick = () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); document.getElementById('webhookStatus').innerHTML = webhookUrl ? '✓ Webhook active' : ''; showToast(webhookUrl ? '✅ Webhook URL saved!' : 'Webhook cleared'); modal.remove(); };
+        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL first'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Test", description: "Your Twitter webhook is configured correctly! The Cloud Function will now send all posts 24/7.", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('📡 Test sent!'); } catch(e) { showToast('❌ Test failed'); } };
+        document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); document.getElementById('webhookStatus').innerHTML = ''; showToast('Webhook cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+    }
+
+    // REAL-TIME FEED UPDATE - NO REFRESH NEEDED!
+    function setupRealtimeFeed() {
+        if (realtimeListenerActive) return;
+        realtimeListenerActive = true;
+        
+        // Listen for new tweets
+        tweetsRef.orderByChild('timestamp').startAfter(Date.now() - 10000).on('child_added', async (snapshot) => {
+            const tweet = snapshot.val();
+            const tweetId = snapshot.key;
+            // Check if this tweet is already in the feed (by checking timestamp recency)
+            const existingCards = document.querySelectorAll(`.tweet-card[data-tweet-id="${tweetId}"]`);
+            if (existingCards.length === 0 && tweet.timestamp > Date.now() - 5000) {
+                // Add to feed dynamically
+                const feedDiv = document.getElementById('feedList');
+                if (feedDiv) {
+                    const userSnap = await usersRef.child(tweet.uid).once('value');
+                    const profile = userSnap.val() || { username: 'twitizen', profilePicUrl: null };
+                    const username = profile.username;
+                    const profilePic = profile.profilePicUrl;
+                    const timeAgo = new Date(tweet.timestamp).toLocaleString();
+                    const avatarHtml = profilePic ? `<img class="tweet-avatar-img" src="${profilePic}">` : `<span>${username.charAt(0).toUpperCase()}</span>`;
+                    const processedContent = escapeHtml(tweet.content || '').replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+                    
+                    const newTweetHtml = `<div class="tweet-card" data-tweet-id="${tweetId}" style="animation: fadeInOut 0.5s ease;">
+                        <div class="tweet-header">
+                            <div class="tweet-avatar">${avatarHtml}</div>
+                            <div class="tweet-name-area">
+                                <div class="tweet-name-row">
+                                    <span class="tweet-username">${escapeHtml(formatUsername(username))}</span>
+                                    <i class="fas fa-check-circle verified-icon"></i>
+                                    <span class="tweet-time">${escapeHtml(timeAgo)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tweet-content">${processedContent}</div>
+                        ${tweet.imageUrl ? `<div class="tweet-media" onclick="showImageZoom('${tweet.imageUrl}')"><img src="${tweet.imageUrl}" loading="lazy"></div>` : ''}
+                        <div class="engagement-bar">
+                            <div class="eng-item comment-eng" data-tweetid="${tweetId}" data-username="${escapeHtml(username)}" data-content="${escapeHtml(tweet.content || '').substring(0, 150)}"><i class="far fa-comment"></i> 0</div>
+                            <div class="eng-item retweet-eng" data-tweetid="${tweetId}" data-original-id="${tweetId}" data-original-username="${escapeHtml(username)}" data-original-content="${escapeHtml(tweet.content || '')}"><i class="fas fa-retweet"></i> 0</div>
+                            <div class="eng-item like-eng" data-tweetid="${tweetId}"><i class="far fa-heart"></i> 0</div>
+                            <div class="eng-item"><i class="far fa-eye"></i> 0</div>
+                        </div>
+                    </div>`;
+                    
+                    feedDiv.insertAdjacentHTML('afterbegin', newTweetHtml);
+                    showToast('✨ New tweet appeared!');
+                    
+                    // Re-attach event listeners
+                    attachEventListeners();
+                }
+            }
+        });
+    }
+    
+    function attachEventListeners() {
+        document.querySelectorAll('.comment-eng').forEach(el => {
+            el.removeEventListener('click', window.commentHandler);
+            window.commentHandler = (e) => {
+                e.stopPropagation();
+                const tid = el.getAttribute('data-tweetid');
+                const username = el.getAttribute('data-username');
+                const content = el.getAttribute('data-content');
+                showCommentsModal(tid, username, content);
+            };
+            el.addEventListener('click', window.commentHandler);
+        });
+        
+        document.querySelectorAll('.like-eng').forEach(el => {
+            el.removeEventListener('click', window.likeHandler);
+            window.likeHandler = async (e) => {
+                e.stopPropagation();
+                const tid = el.getAttribute('data-tweetid');
+                await toggleLike(tid, currentUser.uid);
+                renderFeed();
+            };
+            el.addEventListener('click', window.likeHandler);
+        });
+        
+        document.querySelectorAll('.retweet-eng').forEach(el => {
+            el.removeEventListener('click', window.retweetHandler);
+            window.retweetHandler = async (e) => {
+                e.stopPropagation();
+                const originalId = el.getAttribute('data-original-id');
+                const originalUsername = el.getAttribute('data-original-username');
+                const originalContent = el.getAttribute('data-original-content');
+                const originalTweet = { content: originalContent, imageUrl: null };
+                await toggleRetweet(originalId, originalTweet, originalUsername);
+                renderFeed();
+            };
+            el.addEventListener('click', window.retweetHandler);
+        });
     }
 
     async function renderFeed() {
@@ -490,6 +493,7 @@
         if (!container) return;
         if (!currentUser) { container.innerHTML = `<div style="padding:40px; text-align:center"><i class="fab fa-twitter" style="font-size:48px;"></i><h3>Join Twitter</h3><p>Sign in to see chirps</p></div>`; return; }
         container.innerHTML = `<div class="compose-area"><textarea id="tweetText" class="compose-input" placeholder="What's happening?"></textarea><div id="tweetImagePreview" class="image-preview-area" style="display:none"><img id="previewImg"><div class="remove-image-btn" id="removeImageBtn">×</div></div><div class="compose-footer"><div class="post-actions"><input type="file" id="imageUpload" accept="image/*" style="display:none"><button id="attachImageBtn" class="icon-btn"><i class="fas fa-image"></i></button></div><button id="publishTweetBtn" class="tweet-btn">Post</button></div></div><div class="feed" id="feedList">Loading...</div>`;
+        
         let selectedFile = null;
         const imgInput = document.getElementById('imageUpload');
         const attachBtn = document.getElementById('attachImageBtn');
@@ -499,15 +503,20 @@
         attachBtn.onclick = () => imgInput.click();
         imgInput.onchange = (e) => { if (e.target.files.length) { selectedFile = e.target.files[0]; const reader = new FileReader(); reader.onload = (ev) => { previewImg.src = ev.target.result; previewArea.style.display = 'block'; }; reader.readAsDataURL(selectedFile); } };
         removeBtn.onclick = () => { selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; };
+        
         document.getElementById('publishTweetBtn').onclick = async () => {
             const content = document.getElementById('tweetText').value.trim();
             if (!content && !selectedFile) return;
             let imageUrl = null;
-            if (selectedFile) imageUrl = await uploadImage(selectedFile);
+            if (selectedFile) {
+                imageUrl = await uploadImage(selectedFile);
+                if (!imageUrl) return;
+            }
             const tweetId = generateId();
             await tweetsRef.child(tweetId).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, timestamp: Date.now(), isRetweet: false });
-            document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; renderFeed(); showToast('✨ Posted!');
+            document.getElementById('tweetText').value = ''; selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; showToast('✨ Posted!');
         };
+        
         const snapshot = await tweetsRef.orderByChild('timestamp').once('value');
         const tweets = snapshot.val() || {};
         const tweetsArray = Object.entries(tweets).sort((a,b) => b[1].timestamp - a[1].timestamp);
@@ -546,12 +555,10 @@
                 </div></div>`;
             }
             feedDiv.innerHTML = feedHtml;
-            
-            document.querySelectorAll('.comment-eng').forEach(el => { el.addEventListener('click', (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); const username = el.getAttribute('data-username'); const content = el.getAttribute('data-content'); showCommentsModal(tid, username, content); }); });
-            document.querySelectorAll('.like-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const tid = el.getAttribute('data-tweetid'); await toggleLike(tid, currentUser.uid); }); });
-            document.querySelectorAll('.retweet-eng').forEach(el => { el.addEventListener('click', async (e) => { e.stopPropagation(); const originalId = el.getAttribute('data-original-id'); const originalUsername = el.getAttribute('data-original-username'); const originalContent = el.getAttribute('data-original-content'); const originalTweet = { content: originalContent, imageUrl: null }; await toggleRetweet(originalId, originalTweet, originalUsername); }); });
+            attachEventListeners();
             for(let [tid] of tweetsArray) registerView(tid);
         }
+        setupRealtimeFeed();
     }
 
     async function showEditUsernameModal() {
@@ -561,7 +568,7 @@
         modal.style.display = 'flex';
         modal.innerHTML = `<div class="modal-card"><h3>Change username</h3><input type="text" id="newUsername" placeholder="Username" value="${currentUserProfile?.username || ''}"><div class="button-group"><button id="saveUsernameBtn" class="btn-primary btn">Save</button><button id="cancelUsernameBtn" class="btn-outline btn">Cancel</button></div><p>Your handle will appear as @username</p></div>`;
         document.body.appendChild(modal);
-        document.getElementById('saveUsernameBtn').onclick = async () => { let newName = document.getElementById('newUsername').value.trim(); if(newName.length < 2) newName = "twitizen"; newName = newName.replace(/^@/, ''); await usersRef.child(currentUser.uid).update({ username: newName }); currentUserProfile.username = newName; updateAuthUI(); renderFeed(); modal.remove(); };
+        document.getElementById('saveUsernameBtn').onclick = async () => { let newName = document.getElementById('newUsername').value.trim(); if(newName.length < 2) newName = "twitizen"; newName = newName.replace(/^@/, ''); await usersRef.child(currentUser.uid).update({ username: newName }); currentUserProfile.username = newName; updateAuthUI(); modal.remove(); };
         document.getElementById('cancelUsernameBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
@@ -596,7 +603,7 @@
         return profile;
     }
 
-    auth.onAuthStateChanged(async (user) => { if(user) { currentUser = user; currentUserProfile = await loadUserProfile(user.uid); updateAuthUI(); if (webhookUrl) setupWebhookListener(); } else { currentUser = null; currentUserProfile = null; updateAuthUI(); } });
+    auth.onAuthStateChanged(async (user) => { if(user) { currentUser = user; currentUserProfile = await loadUserProfile(user.uid); updateAuthUI(); } else { currentUser = null; currentUserProfile = null; updateAuthUI(); } });
 
     function showAuthModal(mode) {
         const modalDiv = document.createElement('div');
@@ -612,7 +619,7 @@
 
     initDarkMode();
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-    verifyAndAuthorizeIP().then(() => { const webhookElem = document.getElementById('webhookBadge'); if (webhookElem) webhookElem.addEventListener('click', showWebhookModal); if (webhookUrl) setupWebhookListener(); });
+    verifyAndAuthorizeIP().then(() => { const webhookElem = document.getElementById('webhookBadge'); if (webhookElem) webhookElem.addEventListener('click', showWebhookModal); if (webhookUrl) document.getElementById('webhookStatus').innerHTML = '✓ Webhook active'; });
     document.getElementById('mainContent').innerHTML = '<div style="padding:40px;text-align:center">Loading Twitter...</div>';
     window.showImageZoom = showImageZoom;
 </script>
