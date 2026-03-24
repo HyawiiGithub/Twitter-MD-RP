@@ -33,6 +33,8 @@
             --like-color: #f91880;
             --webhook-badge-bg: #e8f5fe;
             --quote-bg: #f7f9f9;
+            --disabled-color: #ef4444;
+            --disabled-bg: #fee2e2;
         }
         
         body.dark-mode {
@@ -53,30 +55,17 @@
             --like-color: #f91880;
             --webhook-badge-bg: #1a2a3a;
             --quote-bg: #080808;
+            --disabled-color: #f87171;
+            --disabled-bg: #2a1a1a;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.3s ease, color 0.3s ease; }
         .app-container { max-width: 1200px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; display: flex; }
         
-        /* Smooth Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
         
         .sidebar, .main-content, .right-sidebar { animation: slideIn 0.4s ease-out; }
         .tweet-card { animation: fadeInUp 0.3s ease-out; transition: transform 0.2s ease, box-shadow 0.2s ease; }
@@ -89,6 +78,15 @@
         .avatar:hover, .profile-avatar:hover { transform: scale(1.05); }
         .modal { animation: fadeInUp 0.2s ease-out; }
         .toast { animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+        
+        /* Disabled styling for restricted categories */
+        .category-select option:disabled { color: var(--disabled-color); background: var(--disabled-bg); text-decoration: line-through; }
+        .category-item.disabled { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; background: var(--disabled-bg); }
+        .category-item.disabled:hover { transform: none; background: var(--disabled-bg); }
+        .post-btn-disabled { background: #9ca3af !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; text-decoration: line-through; }
+        .post-btn-disabled:hover { background: #9ca3af !important; transform: none !important; }
+        .permission-warning { font-size: 0.7rem; color: var(--disabled-color); margin-left: 8px; animation: shake 0.3s ease; }
         
         .sidebar { width: 280px; background: var(--bg-primary); border-right: 1px solid var(--border-color); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
         .sidebar-logo { font-size: 24px; font-weight: 800; color: #1d9bf0; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
@@ -110,6 +108,7 @@
         .profile-name { font-weight: 700; font-size: 1.2rem; }
         .profile-handle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; }
         .profile-bio { font-size: 0.85rem; margin: 8px 0; word-break: break-word; }
+        .role-badge { display: inline-block; background: #1d9bf0; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin: 4px 2px; }
         .edit-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 12px; font-size: 0.75rem; cursor: pointer; margin-top: 8px; color: var(--text-primary); transition: all 0.2s ease; }
         .edit-profile-btn:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
         
@@ -143,14 +142,11 @@
         .tweet-time { color: var(--text-secondary); font-size: 0.75rem; }
         .category-badge { background: var(--webhook-badge-bg); color: #1d9bf0; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
         .privacy-badge { background: var(--border-color); color: var(--text-secondary); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
-        .retweet-header, .quote-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; margin-left: 56px; color: var(--retweet-color); font-size: 0.75rem; }
         .tweet-content { margin: 8px 0 12px 56px; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
         .tweet-content a { color: #1d9bf0; text-decoration: none; }
         .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease; }
         .tweet-media:hover { transform: scale(1.02); }
         .tweet-media img { max-width: 100%; max-height: 300px; border-radius: 20px; }
-        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; transition: all 0.2s ease; }
-        .quoted-tweet:hover { background: var(--bg-hover); transform: translateX(2px); }
         .engagement-bar { display: flex; gap: 20px; margin-top: 12px; margin-left: 56px; color: var(--text-secondary); }
         .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
         .eng-item:hover { color: #1d9bf0; transform: scale(1.05); }
@@ -162,21 +158,17 @@
         .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); animation: fadeInUp 0.3s ease-out; }
         .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
         .modal-card input:focus, .modal-card textarea:focus { border-color: #1d9bf0; outline: none; transform: scale(1.01); }
-        .comments-list { max-height: 400px; overflow-y: auto; margin: 16px 0; }
-        .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; animation: fadeInUp 0.2s ease-out; }
-        .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; flex-shrink: 0; }
+        .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
         .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; transition: all 0.2s ease; }
-        .webhook-badge:hover { transform: scale(1.05); background: #d4eaf8; }
+        .webhook-badge:hover { transform: scale(1.05); }
         .webhook-hidden { display: none !important; }
         .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
         .dark-mode-toggle:hover { transform: scale(1.05); }
-        .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
         .image-preview-area { margin-top: 12px; position: relative; display: inline-block; animation: fadeInUp 0.2s ease-out; }
         .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; }
         .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
-        .remove-image-btn:hover { transform: scale(1.1); background: #dc2626; }
+        .remove-image-btn:hover { transform: scale(1.1); }
         .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         .follow-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; margin-left: 8px; transition: all 0.2s ease; }
         .follow-btn:hover { transform: scale(1.05); }
         .follow-btn.following { background: #1d9bf0; color: white; border-color: #1d9bf0; }
@@ -186,9 +178,6 @@
         .btn-outline { border: 1px solid var(--border-color); color: #1d9bf0; background: transparent; }
         .btn-outline:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
         .auth-buttons { display: flex; gap: 12px; }
-        
-        /* Loading shimmer effect */
-        .loading-shimmer { background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-hover) 50%, var(--bg-card) 100%); background-size: 1000px 100%; animation: shimmer 1.5s infinite; }
     </style>
 </head>
 <body>
@@ -245,6 +234,7 @@
     let currentView = "feed";
     let currentCategory = "all";
     let currentUserIP = "";
+    let userRoles = { gm: false, un: false, unsc: false };
     
     const CATEGORIES = [
         "International News", "GM Rulings", "GM Events", "UN Resolutions", 
@@ -257,6 +247,14 @@
         "UN Resolutions": "🇺🇳", "UNSC Resolutions": "🛡️", "American News": "🇺🇸",
         "European News": "🇪🇺", "Asian News": "🇯🇵", "Middle Eastern News": "🕌",
         "African News": "🌍", "Arms Marketplace": "🔫"
+    };
+    
+    // Permission requirements for restricted categories
+    const CATEGORY_PERMISSIONS = {
+        "GM Rulings": "gm",
+        "GM Events": "gm",
+        "UN Resolutions": "un",
+        "UNSC Resolutions": "unsc"
     };
     
     function generateId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
@@ -273,6 +271,19 @@
                 document.getElementById('webhookBadge').classList.remove('webhook-hidden');
             }
         } catch(e) {}
+    }
+    
+    async function loadUserRoles(uid) {
+        const snap = await db.ref(`users/${uid}/roles`).once('value');
+        const roles = snap.val() || {};
+        userRoles = { gm: roles.gm || false, un: roles.un || false, unsc: roles.unsc || false };
+        return userRoles;
+    }
+    
+    function canPostInCategory(category) {
+        const requiredPerm = CATEGORY_PERMISSIONS[category];
+        if (!requiredPerm) return true; // No permission needed for regular categories
+        return userRoles[requiredPerm] === true;
     }
     
     async function uploadImage(file) {
@@ -294,13 +305,11 @@
         });
     }
     
-    // IMPROVED WEBHOOK WITH CATEGORY SUPPORT
     async function sendToWebhook(type, data, username, userProfilePic, extraInfo = {}) {
         if (!webhookUrl) return;
         const postUrl = `${window.location.origin}${window.location.pathname}?post=${data.postId}`;
         const formattedHandle = `@${username}`;
         let title = "", description = "", color = 0x1D9BF0;
-        
         const categoryName = extraInfo.category || "General";
         const categoryIcon = CATEGORY_ICONS[categoryName] || "📰";
         
@@ -463,7 +472,7 @@
         document.body.appendChild(modal);
         const urlInput = document.getElementById('webhookUrlInput');
         document.getElementById('saveWebhookBtn').onclick = async () => { webhookUrl = urlInput.value.trim(); localStorage.setItem('twitter_webhook', webhookUrl); if (webhookUrl) await db.ref('config/webhookUrl').set(webhookUrl); else await db.ref('config/webhookUrl').remove(); showToast(webhookUrl ? '✅ Webhook saved' : 'Cleared'); modal.remove(); };
-        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All public posts with categories will be sent here! Categories: 🌍 International News, ⚖️ GM Rulings, 🇺🇳 UN Resolutions, 🔫 Arms Marketplace", color: 0x1D9BF0, footer: { text: "Made by Hyawii • Twitter" } }] }) }); showToast('Test sent!'); } catch(e) { showToast('Failed'); } };
+        document.getElementById('testWebhookBtn').onclick = async () => { const testUrl = urlInput.value.trim(); if (!testUrl) { showToast('Enter URL'); return; } try { await fetch(testUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [{ title: "✅ Webhook Active", description: "All public posts with categories will be sent here!", color: 0x1D9BF0, footer: { text: "Made by Hyawii" } }] }) }); showToast('Test sent!'); } catch(e) { showToast('Failed'); } };
         document.getElementById('clearWebhookBtn').onclick = () => { urlInput.value = ''; webhookUrl = ''; localStorage.removeItem('twitter_webhook'); db.ref('config/webhookUrl').remove(); showToast('Cleared'); modal.remove(); };
         document.getElementById('closeWebhookBtn').onclick = () => modal.remove();
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
@@ -511,17 +520,39 @@
         const widget = document.getElementById('profileWidget');
         if (!currentUserProfile) { widget.innerHTML = '<div class="profile-card"><button class="btn-primary btn" id="signInPrompt">Sign In</button></div>'; return; }
         const avatarHtml = currentUserProfile.profilePicUrl ? `<img src="${currentUserProfile.profilePicUrl}">` : `<i class="fas fa-user" style="font-size:2rem;"></i>`;
-        widget.innerHTML = `<div class="profile-card"><div class="profile-avatar" onclick="showEditProfileModal()">${avatarHtml}</div><div class="profile-name">${escapeHtml(currentUserProfile.displayName || currentUser.email?.split('@')[0])}</div><div class="profile-handle">${escapeHtml(formatUsername(currentUserProfile.username))}</div><div class="profile-bio">${escapeHtml(currentUserProfile.bio || 'No bio yet')}</div><button class="edit-profile-btn" onclick="showEditProfileModal()"><i class="fas fa-edit"></i> Edit Profile</button></div>`;
+        let roleBadges = '';
+        if (userRoles.gm) roleBadges += '<span class="role-badge">⚖️ GM</span>';
+        if (userRoles.un) roleBadges += '<span class="role-badge">🇺🇳 UN</span>';
+        if (userRoles.unsc) roleBadges += '<span class="role-badge">🛡️ UNSC</span>';
+        widget.innerHTML = `<div class="profile-card"><div class="profile-avatar" onclick="showEditProfileModal()">${avatarHtml}</div><div class="profile-name">${escapeHtml(currentUserProfile.displayName || currentUser.email?.split('@')[0])}</div><div class="profile-handle">${escapeHtml(formatUsername(currentUserProfile.username))}</div><div class="profile-bio">${escapeHtml(currentUserProfile.bio || 'No bio yet')}</div><div>${roleBadges}</div><button class="edit-profile-btn" onclick="showEditProfileModal()"><i class="fas fa-edit"></i> Edit Profile</button></div>`;
     }
     
     function updateCategoriesWidget() {
         const widget = document.getElementById('categoriesWidget');
         let html = '<div class="categories-list"><h4 style="margin-bottom:12px;">Categories</h4>';
         html += `<div class="category-item ${currentCategory === 'all' ? 'active' : ''}" data-cat="all"><span>📰 All Posts</span></div>`;
-        for (const cat of CATEGORIES) { html += `<div class="category-item" data-cat="${cat}"><span>${CATEGORY_ICONS[cat] || '📁'} ${cat}</span></div>`; }
+        for (const cat of CATEGORIES) {
+            const requiredPerm = CATEGORY_PERMISSIONS[cat];
+            const hasPerm = !requiredPerm || userRoles[requiredPerm];
+            const disabledClass = !hasPerm ? 'disabled' : '';
+            html += `<div class="category-item ${disabledClass} ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}" ${!hasPerm ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}><span>${CATEGORY_ICONS[cat] || '📁'} ${cat}</span>${!hasPerm ? '<span style="font-size:0.6rem;">🔒</span>' : ''}</div>`;
+        }
         html += '</div>';
         widget.innerHTML = html;
-        document.querySelectorAll('.category-item').forEach(el => { el.addEventListener('click', () => { currentCategory = el.dataset.cat; updateCategoriesWidget(); renderFeed(); }); });
+        document.querySelectorAll('.category-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const cat = el.dataset.cat;
+                const requiredPerm = CATEGORY_PERMISSIONS[cat];
+                const hasPerm = !requiredPerm || userRoles[requiredPerm];
+                if (!hasPerm) {
+                    showToast(`❌ You need ${requiredPerm?.toUpperCase()} permissions to view this category`);
+                    return;
+                }
+                currentCategory = cat;
+                updateCategoriesWidget();
+                renderFeed();
+            });
+        });
     }
     
     async function renderFeed() {
@@ -535,7 +566,14 @@
                 <div id="tweetImagePreview" class="image-preview-area" style="display:none"><img id="previewImg"><div class="remove-image-btn" id="removeImageBtn">×</div></div>
                 <div class="compose-footer">
                     <div>
-                        <select id="postCategory" class="category-select">${CATEGORIES.map(cat => `<option value="${cat}">${CATEGORY_ICONS[cat] || '📁'} ${cat}</option>`).join('')}</select>
+                        <select id="postCategory" class="category-select">
+                            ${CATEGORIES.map(cat => {
+                                const requiredPerm = CATEGORY_PERMISSIONS[cat];
+                                const hasPerm = !requiredPerm || userRoles[requiredPerm];
+                                const disabled = !hasPerm;
+                                return `<option value="${cat}" ${disabled ? 'disabled style="text-decoration:line-through;color:#ef4444;"' : ''}>${CATEGORY_ICONS[cat] || '📁'} ${cat} ${disabled ? '🔒' : ''}</option>`;
+                            }).join('')}
+                        </select>
                         <select id="postPrivacy" class="privacy-select"><option value="public">🌍 Public</option><option value="private">🔒 Private (Only me)</option><option value="followers">👥 Followers Only</option></select>
                     </div>
                     <div>
@@ -543,6 +581,7 @@
                         <button id="publishTweetBtn" class="tweet-btn">Post</button>
                     </div>
                 </div>
+                <div id="permissionWarning" style="font-size:0.75rem; margin-top:8px; color:var(--disabled-color); display:none;"></div>
             </div>
             <div class="feed" id="feedList">Loading...</div>
         `;
@@ -553,17 +592,44 @@
         const previewArea = document.getElementById('tweetImagePreview');
         const previewImg = document.getElementById('previewImg');
         const removeBtn = document.getElementById('removeImageBtn');
+        const categorySelect = document.getElementById('postCategory');
+        const postBtn = document.getElementById('publishTweetBtn');
+        const warningDiv = document.getElementById('permissionWarning');
+        
+        function updatePostButtonPermission() {
+            const selectedCat = categorySelect.value;
+            const canPost = canPostInCategory(selectedCat);
+            if (!canPost) {
+                postBtn.disabled = true;
+                postBtn.classList.add('post-btn-disabled');
+                warningDiv.style.display = 'block';
+                const requiredPerm = CATEGORY_PERMISSIONS[selectedCat];
+                warningDiv.innerHTML = `⚠️ You need <strong>${requiredPerm?.toUpperCase()}</strong> permissions to post in ${selectedCat}. Contact an admin.`;
+            } else {
+                postBtn.disabled = false;
+                postBtn.classList.remove('post-btn-disabled');
+                warningDiv.style.display = 'none';
+            }
+        }
+        
+        categorySelect.addEventListener('change', updatePostButtonPermission);
+        updatePostButtonPermission();
+        
         attachBtn.onclick = () => imgInput.click();
         imgInput.onchange = (e) => { if (e.target.files.length) { selectedFile = e.target.files[0]; const reader = new FileReader(); reader.onload = (ev) => { previewImg.src = ev.target.result; previewArea.style.display = 'block'; }; reader.readAsDataURL(selectedFile); } };
         removeBtn.onclick = () => { selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; };
         
-        document.getElementById('publishTweetBtn').onclick = async () => {
+        postBtn.onclick = async () => {
+            if (postBtn.disabled) {
+                showToast('❌ You do not have permission to post in this category');
+                return;
+            }
             const content = document.getElementById('tweetText').value.trim();
             if (!content && !selectedFile) return;
+            const category = categorySelect.value;
+            const privacy = document.getElementById('postPrivacy').value;
             let imageUrl = null;
             if (selectedFile) { imageUrl = await uploadImage(selectedFile); if (!imageUrl) { showToast('Image upload failed'); return; } }
-            const category = document.getElementById('postCategory').value;
-            const privacy = document.getElementById('postPrivacy').value;
             const postId = generateId();
             await db.ref(`posts/${postId}`).set({ uid: currentUser.uid, content: content, imageUrl: imageUrl, category: category, privacy: privacy, timestamp: Date.now() });
             if (webhookUrl && privacy === 'public') {
@@ -678,8 +744,21 @@
     }
     
     auth.onAuthStateChanged(async (user) => {
-        if (user) { currentUser = user; currentUserProfile = await loadUserProfile(user.uid); updateAuthUI(); updateProfileWidget(); updateCategoriesWidget(); renderFeed(); }
-        else { currentUser = null; currentUserProfile = null; updateAuthUI(); updateProfileWidget(); renderFeed(); }
+        if (user) { 
+            currentUser = user; 
+            currentUserProfile = await loadUserProfile(user.uid);
+            await loadUserRoles(user.uid);
+            updateAuthUI(); 
+            updateProfileWidget(); 
+            updateCategoriesWidget(); 
+            renderFeed(); 
+        } else { 
+            currentUser = null; 
+            currentUserProfile = null; 
+            updateAuthUI(); 
+            updateProfileWidget(); 
+            renderFeed(); 
+        }
     });
     
     function showAuthModal(mode) {
