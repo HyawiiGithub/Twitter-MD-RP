@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>Twitter - Global News & Geopolitics</title>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -59,30 +59,83 @@
             --disabled-bg: #2a1a1a;
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.3s ease, color 0.3s ease; }
-        .app-container { max-width: 1200px; margin: 0 auto; background: var(--bg-primary); min-height: 100vh; display: flex; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-secondary); color: var(--text-primary); transition: background 0.3s ease, color 0.3s ease; overflow-x: hidden; }
         
+        /* Mobile-first responsive layout */
+        .app-container { max-width: 100%; min-height: 100vh; background: var(--bg-primary); position: relative; }
+        
+        /* Mobile Bottom Navigation */
+        .mobile-bottom-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); border-top: 1px solid var(--border-color); padding: 8px 16px; z-index: 100; justify-content: space-around; backdrop-filter: blur(10px); }
+        .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; border-radius: 40px; cursor: pointer; color: var(--text-secondary); transition: all 0.2s ease; font-size: 0.7rem; }
+        .mobile-nav-item i { font-size: 1.4rem; }
+        .mobile-nav-item.active { color: #1d9bf0; background: var(--webhook-badge-bg); }
+        .mobile-nav-item:active { transform: scale(0.95); }
+        
+        /* Desktop Sidebar - hidden on mobile */
+        .sidebar { width: 280px; background: var(--bg-primary); border-right: 1px solid var(--border-color); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .right-sidebar { width: 300px; padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        
+        /* Main Content - full width on mobile */
+        .main-content { flex: 1; max-width: 700px; border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); width: 100%; }
+        
+        /* Responsive layout */
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .right-sidebar { display: none; }
+            .mobile-bottom-nav { display: flex; }
+            .main-content { max-width: 100%; border-left: none; border-right: none; margin-bottom: 70px; }
+            .header { position: sticky; top: 0; z-index: 90; }
+            .tweet-card { padding: 12px 16px; }
+            .tweet-avatar { width: 40px; height: 40px; }
+            .tweet-content, .tweet-media, .engagement-bar, .retweet-header, .quote-header, .quoted-tweet { margin-left: 52px; }
+            .engagement-bar { gap: 16px; flex-wrap: wrap; }
+            .compose-footer { flex-direction: column; align-items: stretch; }
+            .compose-footer > div { display: flex; gap: 8px; justify-content: space-between; }
+            .category-select, .privacy-select { flex: 1; }
+            .modal-card { width: 95%; padding: 20px; }
+            .profile-card { padding: 16px; }
+            .categories-list { max-height: 300px; overflow-y: auto; }
+        }
+        
+        @media (max-width: 480px) {
+            .header h2 { font-size: 1rem; }
+            .dark-mode-toggle, .webhook-badge { padding: 6px 10px; font-size: 0.7rem; }
+            .tweet-username, .tweet-handle { font-size: 0.85rem; }
+            .tweet-time { font-size: 0.7rem; }
+            .engagement-bar { gap: 12px; }
+            .eng-item { font-size: 0.7rem; }
+            .eng-item i { font-size: 0.85rem; }
+            .category-badge, .privacy-badge { font-size: 0.6rem; padding: 2px 6px; }
+        }
+        
+        /* Desktop layout - flex row */
+        @media (min-width: 769px) {
+            .app-container { display: flex; max-width: 1200px; margin: 0 auto; }
+            .mobile-bottom-nav { display: none; }
+        }
+        
+        /* Animations */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
         
-        .sidebar, .main-content, .right-sidebar { animation: slideIn 0.4s ease-out; }
         .tweet-card { animation: fadeInUp 0.3s ease-out; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .tweet-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .nav-item, .category-item, .eng-item, .btn, .icon-btn, .follow-btn { transition: all 0.2s ease; }
+        .tweet-card:active { transform: scale(0.99); }
+        .nav-item, .category-item, .eng-item, .btn, .icon-btn, .follow-btn, .mobile-nav-item { transition: all 0.2s ease; cursor: pointer; }
         .nav-item:hover, .category-item:hover { transform: translateX(4px); }
-        .eng-item:active { transform: scale(0.95); }
+        .eng-item:active, .mobile-nav-item:active { transform: scale(0.95); }
         .tweet-btn:active, .btn-primary:active { transform: scale(0.97); }
         .avatar, .profile-avatar { transition: transform 0.2s ease, border-color 0.2s ease; }
-        .avatar:hover, .profile-avatar:hover { transform: scale(1.05); }
+        .avatar:active, .profile-avatar:active { transform: scale(0.98); }
         .modal { animation: fadeInUp 0.2s ease-out; }
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1d9bf0; color: white; padding: 10px 20px; border-radius: 40px; font-size: 0.85rem; z-index: 1100; animation: slideIn 0.3s ease-out, fadeOut 2s ease 1s forwards; white-space: nowrap; }
+        @media (max-width: 768px) { .toast { bottom: 80px; white-space: normal; max-width: 90%; text-align: center; } }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         
         .post-btn-disabled { background: #9ca3af !important; cursor: not-allowed !important; transform: none !important; opacity: 0.6; text-decoration: line-through; }
         .category-item.disabled { opacity: 0.5; text-decoration: line-through; cursor: not-allowed; }
         
-        .sidebar { width: 280px; background: var(--bg-primary); border-right: 1px solid var(--border-color); padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        /* Sidebar styles (desktop) */
         .sidebar-logo { font-size: 24px; font-weight: 800; color: #1d9bf0; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
         .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 40px; cursor: pointer; color: var(--text-secondary); }
@@ -90,93 +143,93 @@
         .nav-item.active { background: var(--webhook-badge-bg); color: #1d9bf0; font-weight: 600; }
         .nav-item i { width: 24px; font-size: 1.2rem; }
         
-        .main-content { flex: 1; max-width: 700px; border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); }
-        .header { background: var(--bg-primary); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); padding: 14px 20px; position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; }
+        .header { background: var(--bg-primary); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); padding: 12px 16px; position: sticky; top: 0; z-index: 90; display: flex; justify-content: space-between; align-items: center; }
         .header h2 { font-size: 1.2rem; }
         
-        .right-sidebar { width: 300px; padding: 20px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
         .profile-card { background: var(--user-panel-bg); border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; transition: transform 0.2s ease; }
-        .profile-card:hover { transform: translateY(-2px); }
+        .profile-card:active { transform: scale(0.98); }
         .profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--avatar-bg); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; overflow: hidden; cursor: pointer; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .profile-name { font-weight: 700; font-size: 1.2rem; }
+        .profile-name { font-weight: 700; font-size: 1.2rem; word-break: break-word; }
         .profile-handle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 8px; cursor: pointer; }
-        .profile-handle:hover { text-decoration: underline; color: #1d9bf0; }
+        .profile-handle:active { opacity: 0.7; }
         .profile-bio { font-size: 0.85rem; margin: 8px 0; word-break: break-word; }
         .role-badge { display: inline-block; background: #1d9bf0; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin: 4px 2px; }
         .edit-profile-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 6px 12px; font-size: 0.75rem; cursor: pointer; margin-top: 8px; color: var(--text-primary); transition: all 0.2s ease; }
-        .edit-profile-btn:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
+        .edit-profile-btn:active { transform: scale(0.96); }
         
         .categories-list { background: var(--user-panel-bg); border-radius: 20px; padding: 16px; }
-        .category-item { padding: 8px 12px; margin: 4px 0; border-radius: 40px; cursor: pointer; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); transition: all 0.2s ease; }
-        .category-item:hover { background: var(--webhook-badge-bg); transform: translateX(4px); }
+        .category-item { padding: 10px 12px; margin: 4px 0; border-radius: 40px; cursor: pointer; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); transition: all 0.2s ease; }
+        .category-item:active { transform: scale(0.98); }
         .category-item.active { background: #1d9bf0; color: white; }
         
-        .compose-area { padding: 16px 20px; border-bottom: 8px solid var(--border-color); }
-        .compose-input { width: 100%; border: none; outline: none; font-size: 1.1rem; resize: none; padding: 12px 0; min-height: 80px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
-        .compose-input:focus { padding-left: 8px; }
+        .compose-area { padding: 12px 16px; border-bottom: 8px solid var(--border-color); }
+        .compose-input { width: 100%; border: none; outline: none; font-size: 1rem; resize: none; padding: 12px 0; min-height: 70px; background: var(--input-bg); color: var(--text-primary); }
+        .compose-input:focus { padding-left: 4px; }
         .compose-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
         .category-select, .privacy-select { padding: 8px 12px; border-radius: 40px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
-        .category-select:hover, .privacy-select:hover { border-color: #1d9bf0; }
         .tweet-btn { background: #1d9bf0; color: white; border: none; border-radius: 40px; padding: 8px 20px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
-        .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; transition: all 0.2s ease; }
-        .icon-btn:hover { transform: scale(1.1); }
+        .icon-btn { background: none; border: none; font-size: 1.3rem; color: #1d9bf0; cursor: pointer; padding: 8px; }
+        .icon-btn:active { transform: scale(0.9); }
         
-        .tweet-card { border-bottom: 1px solid var(--border-color); padding: 16px 20px; background: var(--bg-card); cursor: pointer; }
-        .tweet-card:hover { background: var(--bg-hover); }
+        .tweet-card { border-bottom: 1px solid var(--border-color); padding: 12px 16px; background: var(--bg-card); cursor: pointer; }
+        .tweet-card:active { background: var(--bg-hover); }
         .tweet-header { display: flex; gap: 12px; margin-bottom: 8px; }
-        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; cursor: pointer; transition: transform 0.2s ease; }
-        .tweet-avatar:hover { transform: scale(1.05); }
+        .tweet-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; flex-shrink: 0; overflow: hidden; }
         .tweet-avatar-img { width: 100%; height: 100%; object-fit: cover; }
-        .tweet-name-area { flex: 1; }
+        .tweet-name-area { flex: 1; min-width: 0; }
         .tweet-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .tweet-username { font-weight: 700; cursor: pointer; }
-        .tweet-username:hover { text-decoration: underline; }
-        .tweet-handle { color: var(--text-secondary); font-size: 0.8rem; }
-        .tweet-time { color: var(--text-secondary); font-size: 0.75rem; }
-        .category-badge { background: var(--webhook-badge-bg); color: #1d9bf0; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
-        .privacy-badge { background: var(--border-color); color: var(--text-secondary); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
+        .tweet-username { font-weight: 700; cursor: pointer; word-break: break-word; }
+        .tweet-handle { color: var(--text-secondary); font-size: 0.8rem; word-break: break-word; }
+        .tweet-time { color: var(--text-secondary); font-size: 0.75rem; flex-shrink: 0; }
+        .category-badge { background: var(--webhook-badge-bg); color: #1d9bf0; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
+        .privacy-badge { background: var(--border-color); color: var(--text-secondary); padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; display: inline-block; }
         .tweet-content { margin: 8px 0 12px 56px; font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
         .tweet-content a { color: #1d9bf0; text-decoration: none; }
-        .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; transition: transform 0.2s ease; }
-        .tweet-media:hover { transform: scale(1.02); }
-        .tweet-media img { max-width: 100%; max-height: 300px; border-radius: 20px; }
-        .engagement-bar { display: flex; gap: 20px; margin-top: 12px; margin-left: 56px; color: var(--text-secondary); }
-        .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; }
-        .eng-item:hover { color: #1d9bf0; transform: scale(1.05); }
+        .tweet-media { margin: 12px 0 12px 56px; max-width: 100%; border-radius: 20px; overflow: hidden; cursor: pointer; }
+        .tweet-media img { max-width: 100%; max-height: 300px; border-radius: 20px; width: 100%; object-fit: cover; }
+        .engagement-bar { display: flex; gap: 20px; margin-top: 12px; margin-left: 56px; color: var(--text-secondary); flex-wrap: wrap; }
+        .eng-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; padding: 4px 8px; border-radius: 40px; }
+        .eng-item:active { background: var(--webhook-badge-bg); transform: scale(0.96); }
         .eng-item.liked i { color: var(--like-color); }
         .eng-item.retweeted i { color: var(--retweet-color); }
+        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; animation: fadeInUp 0.2s ease-out; }
-        .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 90%; padding: 24px; max-height: 90vh; overflow-y: auto; color: var(--text-primary); animation: fadeInUp 0.3s ease-out; }
-        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s ease; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+        .modal-card { background: var(--modal-bg); border-radius: 28px; max-width: 550px; width: 100%; padding: 20px; max-height: 85vh; overflow-y: auto; color: var(--text-primary); animation: fadeInUp 0.2s ease-out; }
+        .modal-card input, .modal-card textarea { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid var(--border-color); border-radius: 16px; background: var(--input-bg); color: var(--text-primary); font-size: 1rem; }
         .comments-list { max-height: 400px; overflow-y: auto; margin: 16px 0; }
         .single-comment { padding: 12px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; }
         .comment-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--avatar-bg); display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; flex-shrink: 0; }
-        .quoted-tweet { background: var(--quote-bg); border-radius: 16px; padding: 12px; margin-top: 8px; margin-left: 56px; border-left: 3px solid var(--button-primary); cursor: pointer; transition: all 0.2s ease; }
-        .quoted-tweet:hover { background: var(--bg-hover); transform: translateX(2px); }
         .button-group { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
-        .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; transition: all 0.2s ease; }
-        .webhook-badge:hover { transform: scale(1.05); }
+        .webhook-badge { background: var(--webhook-badge-bg); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: #1d9bf0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+        .webhook-badge:active { transform: scale(0.95); }
         .webhook-hidden { display: none !important; }
-        .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 8px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
-        .dark-mode-toggle:hover { transform: scale(1.05); }
-        .image-preview-area { margin-top: 12px; position: relative; display: inline-block; animation: fadeInUp 0.2s ease-out; }
-        .image-preview-area img { max-width: 100px; max-height: 100px; border-radius: 16px; object-fit: cover; }
-        .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; }
+        .dark-mode-toggle { background: var(--webhook-badge-bg); border: none; border-radius: 40px; padding: 6px 12px; cursor: pointer; color: var(--text-primary); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease; }
+        .dark-mode-toggle:active { transform: scale(0.95); }
+        .image-preview-area { margin-top: 12px; position: relative; display: inline-block; }
+        .image-preview-area img { max-width: 80px; max-height: 80px; border-radius: 16px; object-fit: cover; }
+        .remove-image-btn { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
         .follow-btn { background: none; border: 1px solid var(--border-color); border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; cursor: pointer; margin-left: 8px; transition: all 0.2s ease; }
-        .follow-btn:hover { transform: scale(1.05); }
+        .follow-btn:active { transform: scale(0.95); }
         .follow-btn.following { background: #1d9bf0; color: white; border-color: #1d9bf0; }
         .btn { border: none; padding: 8px 16px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; }
         .btn-primary { background: #1d9bf0; color: white; }
-        .btn-primary:hover { background: #0c8ad9; transform: scale(1.02); }
+        .btn-primary:active { transform: scale(0.96); }
         .btn-outline { border: 1px solid var(--border-color); color: #1d9bf0; background: transparent; }
-        .btn-outline:hover { background: var(--webhook-badge-bg); transform: scale(1.02); }
         .auth-buttons { display: flex; gap: 12px; }
+        
+        /* Mobile menu toggle for categories on small screens */
+        .mobile-categories-toggle { display: none; position: fixed; bottom: 80px; right: 16px; background: #1d9bf0; color: white; width: 50px; height: 50px; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 95; }
+        @media (max-width: 768px) { .mobile-categories-toggle { display: flex; } }
+        .mobile-categories-panel { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-primary); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 16px; max-height: 60vh; overflow-y: auto; z-index: 96; transform: translateY(100%); transition: transform 0.3s ease; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .mobile-categories-panel.open { transform: translateY(0); }
+        .mobile-categories-panel h4 { margin-bottom: 12px; }
     </style>
 </head>
 <body>
 <div class="app-container">
+    <!-- Desktop Sidebar -->
     <div class="sidebar">
         <div class="sidebar-logo"><i class="fab fa-twitter"></i> Twitter</div>
         <div class="sidebar-nav">
@@ -187,6 +240,7 @@
         </div>
     </div>
     
+    <!-- Main Content -->
     <div class="main-content">
         <div class="header">
             <h2 id="pageTitle">Home</h2>
@@ -199,9 +253,30 @@
         <div id="mainContent"></div>
     </div>
     
+    <!-- Desktop Right Sidebar -->
     <div class="right-sidebar">
         <div id="profileWidget"></div>
         <div id="categoriesWidget"></div>
+    </div>
+    
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <div class="mobile-nav-item active" data-view="feed"><i class="fas fa-home"></i><span>Home</span></div>
+        <div class="mobile-nav-item" data-view="following"><i class="fas fa-users"></i><span>Following</span></div>
+        <div class="mobile-nav-item" data-view="marketplace"><i class="fas fa-exchange-alt"></i><span>Market</span></div>
+        <div class="mobile-nav-item" data-view="profile-mobile" id="mobileProfileBtn"><i class="fas fa-user"></i><span>Profile</span></div>
+    </div>
+    
+    <!-- Mobile Categories Toggle Button -->
+    <div class="mobile-categories-toggle" id="mobileCategoriesToggle">
+        <i class="fas fa-tags"></i>
+    </div>
+    
+    <!-- Mobile Categories Panel -->
+    <div class="mobile-categories-panel" id="mobileCategoriesPanel">
+        <h4><i class="fas fa-tag"></i> Categories</h4>
+        <div id="mobileCategoriesList"></div>
+        <button id="closeMobileCategories" style="margin-top: 12px; width: 100%;" class="btn-outline btn">Close</button>
     </div>
 </div>
 
@@ -336,12 +411,10 @@
         try { await fetch(webhookUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ embeds: [embed] }) }); } catch(e) {}
     }
     
-    // ========== REAL-TIME WEBHOOK LISTENER - CATCHES ALL POSTS FROM ANY USER ==========
     function setupRealtimeWebhookListener() {
         if (!webhookUrl) return;
         if (webhookListenerActive) return;
         webhookListenerActive = true;
-        console.log('🟢 WEBHOOK LISTENER ACTIVATED - Monitoring ALL public posts from ANY user');
         
         const postsRef = db.ref('posts');
         postsRef.orderByChild('timestamp').limitToLast(1).on('child_added', async (snapshot) => {
@@ -363,44 +436,23 @@
                 { category: post.category }
             );
         });
-        
-        // Listen for replies
-        const commentsRef = db.ref('comments');
-        commentsRef.on('child_added', async (commentSnapshot) => {
-            if (!webhookUrl) return;
-            const tweetId = commentSnapshot.key;
-            const comments = commentSnapshot.val();
-            if (comments) {
-                const commentEntries = Object.entries(comments);
-                const lastComment = commentEntries[commentEntries.length - 1];
-                if (lastComment) {
-                    const [commentId, comment] = lastComment;
-                    const commentKey = `webhook_comment_${commentId}`;
-                    if (localStorage.getItem(commentKey)) return;
-                    localStorage.setItem(commentKey, Date.now().toString());
-                    
-                    const userSnap = await db.ref(`users/${comment.uid}`).once('value');
-                    const user = userSnap.val() || { username: 'unknown', profilePicUrl: null };
-                    const tweetSnap = await db.ref(`posts/${tweetId}`).once('value');
-                    const originalTweet = tweetSnap.val();
-                    const originalAuthorSnap = await db.ref(`users/${originalTweet?.uid}`).once('value');
-                    const originalAuthor = originalAuthorSnap.val()?.username || 'unknown';
-                    
-                    if (originalTweet?.privacy === 'public') {
-                        await sendToWebhook('reply', 
-                            { content: comment.text, postId: tweetId, imageUrl: null },
-                            user.username, user.profilePicUrl,
-                            { originalAuthor: `@${originalAuthor}`, originalContent: originalTweet?.content, category: originalTweet?.category }
-                        );
-                    }
-                }
-            }
-        });
     }
     
-    function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 2000); }
+    function showToast(message) { 
+        const toast = document.createElement('div'); 
+        toast.className = 'toast'; 
+        toast.textContent = message; 
+        document.body.appendChild(toast); 
+        setTimeout(() => toast.remove(), 3000); 
+    }
     
-    async function toggleLike(postId, userId) { const likeRef = db.ref(`likes/${postId}/${userId}`); const snap = await likeRef.once('value'); if (snap.exists()) { await likeRef.remove(); } else { await likeRef.set(true); } renderFeed(); }
+    async function toggleLike(postId, userId) { 
+        const likeRef = db.ref(`likes/${postId}/${userId}`); 
+        const snap = await likeRef.once('value'); 
+        if (snap.exists()) { await likeRef.remove(); } 
+        else { await likeRef.set(true); } 
+        renderFeed(); 
+    }
     async function getLikeCount(postId) { const snap = await db.ref(`likes/${postId}`).once('value'); return snap.val() ? Object.keys(snap.val()).length : 0; }
     async function hasLiked(postId, userId) { const snap = await db.ref(`likes/${postId}/${userId}`).once('value'); return snap.exists(); }
     
@@ -530,7 +582,6 @@
         modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
     }
     
-    // EDIT PROFILE - Can change display name AND username (@handle)
     async function showEditProfileModal() {
         const modal = document.createElement('div');
         modal.className = 'modal';
@@ -541,7 +592,7 @@
             <input type="text" id="editDisplayName" placeholder="Display Name" value="${escapeHtml(currentUserProfile?.displayName || '')}">
             <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Username (@handle)</label>
             <input type="text" id="editUsername" placeholder="Username" value="${escapeHtml(currentUserProfile?.username || '')}" style="font-family: monospace;">
-            <label style="font-size:0.7rem; color:var(--text-secondary);">Letters, numbers, underscores only. Cannot be changed frequently.</label>
+            <label style="font-size:0.7rem; color:var(--text-secondary);">Letters, numbers, underscores only.</label>
             <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Bio</label>
             <textarea id="editBio" placeholder="Bio / Quote" rows="3">${escapeHtml(currentUserProfile?.bio || '')}</textarea>
             <label style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Profile Picture</label>
@@ -559,20 +610,13 @@
             const bio = document.getElementById('editBio').value.trim();
             const avatarFile = document.getElementById('editAvatar').files[0];
             
-            // Validate username
             if (newUsername) {
                 newUsername = newUsername.replace(/[^a-z0-9_]/g, '');
                 if (newUsername.length < 2) newUsername = currentUserProfile?.username;
-                // Check if username is taken by another user
                 const existingUser = await db.ref('users').orderByChild('username').equalTo(newUsername).once('value');
                 let usernameTaken = false;
-                existingUser.forEach(snap => {
-                    if (snap.key !== currentUser.uid) usernameTaken = true;
-                });
-                if (usernameTaken) {
-                    showToast('❌ Username already taken! Choose another.');
-                    return;
-                }
+                existingUser.forEach(snap => { if (snap.key !== currentUser.uid) usernameTaken = true; });
+                if (usernameTaken) { showToast('❌ Username already taken!'); return; }
             }
             
             let avatarUrl = currentUserProfile?.profilePicUrl;
@@ -630,27 +674,31 @@
     
     function updateCategoriesWidget() {
         const widget = document.getElementById('categoriesWidget');
+        const mobileList = document.getElementById('mobileCategoriesList');
         let html = '<div class="categories-list"><h4 style="margin-bottom:12px;">Categories</h4>';
+        let mobileHtml = '';
         html += `<div class="category-item ${currentCategory === 'all' ? 'active' : ''}" data-cat="all"><span>📰 All Posts</span></div>`;
+        mobileHtml += `<div class="category-item ${currentCategory === 'all' ? 'active' : ''}" data-cat="all"><span>📰 All Posts</span></div>`;
         for (const cat of CATEGORIES) {
             const requiredPerm = CATEGORY_PERMISSIONS[cat];
             const hasPerm = !requiredPerm || userRoles[requiredPerm];
             const disabledClass = !hasPerm ? 'disabled' : '';
             html += `<div class="category-item ${disabledClass} ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}" ${!hasPerm ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}><span>${CATEGORY_ICONS[cat] || '📁'} ${cat}</span>${!hasPerm ? '<span style="font-size:0.6rem;">🔒</span>' : ''}</div>`;
+            mobileHtml += `<div class="category-item ${disabledClass} ${currentCategory === cat ? 'active' : ''}" data-cat="${cat}" ${!hasPerm ? 'style="cursor:not-allowed;opacity:0.5;"' : ''}><span>${CATEGORY_ICONS[cat] || '📁'} ${cat}</span>${!hasPerm ? '<span style="font-size:0.6rem;">🔒</span>' : ''}</div>`;
         }
         html += '</div>';
         widget.innerHTML = html;
-        document.querySelectorAll('.category-item').forEach(el => {
+        if (mobileList) mobileList.innerHTML = mobileHtml;
+        
+        document.querySelectorAll('#categoriesWidget .category-item, #mobileCategoriesList .category-item').forEach(el => {
             el.addEventListener('click', () => {
                 const cat = el.dataset.cat;
                 const requiredPerm = CATEGORY_PERMISSIONS[cat];
                 const hasPerm = !requiredPerm || userRoles[requiredPerm];
-                if (!hasPerm) {
-                    showToast(`❌ You need ${requiredPerm?.toUpperCase()} permissions to view this category`);
-                    return;
-                }
+                if (!hasPerm) { showToast(`❌ You need ${requiredPerm?.toUpperCase()} permissions`); return; }
                 currentCategory = cat;
                 updateCategoriesWidget();
+                document.getElementById('mobileCategoriesPanel').classList.remove('open');
                 renderFeed();
             });
         });
@@ -666,18 +714,17 @@
                 <textarea id="tweetText" class="compose-input" placeholder="What's happening?"></textarea>
                 <div id="tweetImagePreview" class="image-preview-area" style="display:none"><img id="previewImg"><div class="remove-image-btn" id="removeImageBtn">×</div></div>
                 <div class="compose-footer">
-                    <div>
-                        <select id="postCategory" class="category-select">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; width:100%;">
+                        <select id="postCategory" class="category-select" style="flex:2;">
                             ${CATEGORIES.map(cat => {
                                 const requiredPerm = CATEGORY_PERMISSIONS[cat];
                                 const hasPerm = !requiredPerm || userRoles[requiredPerm];
-                                const disabled = !hasPerm;
-                                return `<option value="${cat}" ${disabled ? 'disabled style="text-decoration:line-through;color:#ef4444;"' : ''}>${CATEGORY_ICONS[cat] || '📁'} ${cat} ${disabled ? '🔒' : ''}</option>`;
+                                return `<option value="${cat}" ${!hasPerm ? 'disabled style="text-decoration:line-through;color:#ef4444;"' : ''}>${CATEGORY_ICONS[cat] || '📁'} ${cat} ${!hasPerm ? '🔒' : ''}</option>`;
                             }).join('')}
                         </select>
-                        <select id="postPrivacy" class="privacy-select"><option value="public">🌍 Public</option><option value="private">🔒 Private (Only me)</option><option value="followers">👥 Followers Only</option></select>
+                        <select id="postPrivacy" class="privacy-select" style="flex:1;"><option value="public">🌍 Public</option><option value="private">🔒 Private</option><option value="followers">👥 Followers</option></select>
                     </div>
-                    <div>
+                    <div style="display:flex; gap:8px;">
                         <input type="file" id="imageUpload" accept="image/*" style="display:none"><button id="attachImageBtn" class="icon-btn"><i class="fas fa-image"></i></button>
                         <button id="publishTweetBtn" class="tweet-btn">Post</button>
                     </div>
@@ -705,7 +752,7 @@
                 postBtn.classList.add('post-btn-disabled');
                 warningDiv.style.display = 'block';
                 const requiredPerm = CATEGORY_PERMISSIONS[selectedCat];
-                warningDiv.innerHTML = `⚠️ You need <strong>${requiredPerm?.toUpperCase()}</strong> permissions to post in ${selectedCat}. Contact an admin.`;
+                warningDiv.innerHTML = `⚠️ You need <strong>${requiredPerm?.toUpperCase()}</strong> permissions to post in ${selectedCat}.`;
             } else {
                 postBtn.disabled = false;
                 postBtn.classList.remove('post-btn-disabled');
@@ -721,10 +768,7 @@
         removeBtn.onclick = () => { selectedFile = null; previewArea.style.display = 'none'; imgInput.value = ''; };
         
         postBtn.onclick = async () => {
-            if (postBtn.disabled) {
-                showToast('❌ You do not have permission to post in this category');
-                return;
-            }
+            if (postBtn.disabled) { showToast('❌ No permission for this category'); return; }
             const content = document.getElementById('tweetText').value.trim();
             if (!content && !selectedFile) return;
             const category = categorySelect.value;
@@ -782,7 +826,7 @@
                             ${post.uid !== currentUser.uid ? `<button class="follow-btn ${isUserFollowing ? 'following' : ''}" data-uid="${post.uid}">${isUserFollowing ? 'Following' : 'Follow'}</button>` : ''}
                             <span class="tweet-time">${escapeHtml(timeAgo)}</span>
                         </div>
-                        <div style="display:flex; gap:6px; margin-top:4px;">
+                        <div style="display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;">
                             <span class="category-badge"><i class="fas fa-tag"></i> ${categoryIcon} ${escapeHtml(post.category)}</span>
                             <span class="privacy-badge"><i class="fas ${post.privacy === 'public' ? 'fa-globe' : (post.privacy === 'private' ? 'fa-lock' : 'fa-users')}"></i> ${post.privacy}</span>
                         </div>
@@ -791,7 +835,7 @@
             
             if (post.isQuote) {
                 feedHtml += `<div class="quote-header"><i class="fas fa-quote-right"></i> Quoted @${escapeHtml(post.quotedAuthor)}</div>`;
-                feedHtml += `<div class="tweet-content">${processedContent || '<span style="color:var(--text-secondary)">(No additional comment)</span>'}</div>`;
+                feedHtml += `<div class="tweet-content">${processedContent || '<span style="color:var(--text-secondary)">(No comment)</span>'}</div>`;
                 feedHtml += `<div class="quoted-tweet" onclick="showCommentsModal('${post.quotedPostId}', '${escapeHtml(post.quotedAuthor)}', '${escapeHtml(post.quotedContent)}', '${escapeHtml(post.category)}')">
                     <div style="font-weight:600;">@${escapeHtml(post.quotedAuthor)}</div>
                     <div>${escapeHtml(post.quotedContent?.substring(0, 120))}</div>
@@ -873,14 +917,38 @@
         modalDiv.onclick = (e) => { if(e.target === modalDiv) modalDiv.remove(); };
     }
     
-    document.querySelectorAll('.nav-item').forEach(item => {
+    // Navigation for desktop and mobile
+    function setActiveView(view) {
+        document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(nav => nav.classList.remove('active'));
+        if (view === 'feed') {
+            document.querySelectorAll('.nav-item[data-view="feed"], .mobile-nav-item[data-view="feed"]').forEach(el => el.classList.add('active'));
+        } else if (view === 'following') {
+            document.querySelectorAll('.nav-item[data-view="following"], .mobile-nav-item[data-view="following"]').forEach(el => el.classList.add('active'));
+        } else if (view === 'marketplace') {
+            document.querySelectorAll('.nav-item[data-view="marketplace"], .mobile-nav-item[data-view="marketplace"]').forEach(el => el.classList.add('active'));
+        }
+        currentView = view;
+        if (view === 'feed') document.getElementById('pageTitle').innerText = 'Home';
+        else if (view === 'following') document.getElementById('pageTitle').innerText = 'Following';
+        else if (view === 'marketplace') document.getElementById('pageTitle').innerText = 'Arms Marketplace';
+        renderFeed();
+    }
+    
+    document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
         item.addEventListener('click', () => {
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
             const view = item.dataset.view;
             if (view === 'admin') showAdminPanel();
-            else { currentView = view; document.getElementById('pageTitle').innerText = item.querySelector('span:last-child')?.innerText || item.innerText; renderFeed(); }
+            else if (view === 'profile-mobile') showEditProfileModal();
+            else if (view) setActiveView(view);
         });
+    });
+    
+    // Mobile categories panel
+    document.getElementById('mobileCategoriesToggle')?.addEventListener('click', () => {
+        document.getElementById('mobileCategoriesPanel').classList.toggle('open');
+    });
+    document.getElementById('closeMobileCategories')?.addEventListener('click', () => {
+        document.getElementById('mobileCategoriesPanel').classList.remove('open');
     });
     
     initDarkMode();
